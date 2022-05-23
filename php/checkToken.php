@@ -1,7 +1,14 @@
 <?php
 require_once "Mysql.php";
 
+//返回有效用户id或false
 function checkCustomerToken(){
+    if (!array_key_exists('CustomerID', $_COOKIE)){
+        return false;
+    }
+    if (!array_key_exists('token', $_COOKIE)){
+        return false;
+    }
     $CustomerID = $_COOKIE['CustomerID'];
     $token = $_COOKIE['token'];
 
