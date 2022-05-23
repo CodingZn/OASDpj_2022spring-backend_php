@@ -71,4 +71,20 @@ class Mysql
         }
         return substr($columnSql, 0, strlen($columnSql)-1);
     }
+
+    public function selectById($columnNames, $tableName, $idName, $idValue){
+        $condition = "WHERE $idName=$idValue";
+        return $this->select($columnNames, $tableName, $condition);
+    }
+
+    public function selectOneObjById($columnNames, $tableName, $idName, $idValue){
+        $result = selectById($columnNames, $tableName, $idName, $idValue);
+        if ($result === false){
+            die('无法读取数据！' . mysqli_error($this->connect));
+        }else{
+            $row = mysqli_fetch_assoc($result);
+            return $row;
+        }
+
+    }
 }
