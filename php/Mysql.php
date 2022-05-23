@@ -78,7 +78,7 @@ class Mysql
     }
 
     public function selectOneObjById($columnNames, $tableName, $idName, $idValue){
-        $result = selectById($columnNames, $tableName, $idName, $idValue);
+        $result = $this->selectById($columnNames, $tableName, $idName, $idValue);
         if ($result === false){
             die('无法读取数据！' . mysqli_error($this->connect));
         }else{
