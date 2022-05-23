@@ -5,21 +5,24 @@ require_once "../checkToken.php";
 
 $req_method = $_SERVER['REQUEST_METHOD'];
 
-if ($req_method == "GET"){//获取购物车里的所有商品
+if (!checkCustomerToken()) {
+    $data = array("message"=> "无操作权限！");
+    http_response_code(401);
+    exit(json_encode($data));
+}
 
-    http_response_code(405);
+if ($req_method == "POST"){//下单并付款
+    if (array_key_exists('range',$_GET)){
 
-}elseif ($req_method == "POST"){//将一个商品添加到购物车
-    if (!checkCustomerToken()) {
-        $data = array("message"=> "无操作权限！");
-        http_response_code(401);
-        exit(json_encode($data));
+        $range = $_GET['range'];
+    }
+    else {
+        $range = "all";
     }
 
-}
-elseif ($req_method == "DELETE"){//删除购物车中的一个艺术品
 
-    http_response_code(405);
+    http_response_code(200);
+
 }
 else{
     http_response_code(405);
