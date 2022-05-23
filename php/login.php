@@ -18,6 +18,8 @@ $result = $mysql->query($sql);
 
 $row = mysqli_fetch_assoc($result);
 
+$CustomerID = $row['CustomerID'];
+
 $salt = $row['Salt'];
 $hashed_password = $row['Pass'];
 
@@ -26,9 +28,9 @@ if (crypt($password, $salt) === $hashed_password)
 else $success = false;
 
 if ($success){
-    $data = array("message" => "登录成功！");
+    $token = crypt($CustomerID, $salt);
+    $data = array("message" => "登录成功！", "token", $token);
     $data["user"]=$username;
-    setcookie("user", $success, time()+3600);
 }
 else{
     $data = array("message" => "用户名或密码错误！");
