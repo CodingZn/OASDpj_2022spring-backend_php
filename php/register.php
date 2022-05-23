@@ -17,15 +17,18 @@ if (!checkFormats()){
     exit(json_encode($data));
 }
 
+$salt = md5(rand());
+$hashed_password = crypt($password, $salt);
+
 
 $mysql = new Mysql();
 
 $tablename = 'customerlogon';
 
 $sql = "INSERT INTO $tablename ".
-    "(UserName, Pass) ".
+    "(UserName, Pass, Salt) ".
     "VALUES ".
-    "('$username','$password')";
+    "('$username','$hashed_password', '$salt')";
 
 $result = $mysql->query($sql);
 

@@ -1,6 +1,6 @@
 <?php
-require_once "header.php";
+require_once "Salt.php";
 
-$item = "http://www.artic.edu/aic/collections/artwork/111060";
+$salt = new Salt();
 
-echo $item;
+$salt->s();

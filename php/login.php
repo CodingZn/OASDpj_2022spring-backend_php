@@ -12,8 +12,18 @@ $mysql = new Mysql();
 
 $tablename = "customerlogon";
 
-$success = $mysql->func1($tablename, $username, $password);
+$sql = "SELECT * FROM $tablename WHERE UserName='$username'";
 
+$result = $mysql->query($sql);
+
+$row = mysqli_fetch_assoc($result);
+
+$salt = $row['Salt'];
+$hashed_password = $row['Pass'];
+
+if (crypt($password, $salt) === $hashed_password)
+    $success = true;
+else $success = false;
 
 if ($success){
     $data = array("message" => "登录成功！");
