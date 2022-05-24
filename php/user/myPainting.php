@@ -45,18 +45,6 @@ if ($req_method == "GET"){//获取自己的艺术品信息，包括已发布和�
 
     exit(json_encode($data));
 }
-elseif ($req_method == "PATCH"){//修改已发布的艺术品
-    if(array_key_exists('PaintingID', $_GET))
-        $PaintingID = $_GET['PaintingID'];
-    else{
-        http_response_code(400);
-        exit(json_encode(array("message"=>"缺少必要的请求参数！")));
-    }
-
-    //修改操作
-    http_response_code(200);
-
-}
 elseif ($req_method == "DELETE"){//删除已发布的艺术品
     if(array_key_exists('PaintingID', $_GET))
         $PaintingID = $_GET['PaintingID'];
@@ -64,11 +52,28 @@ elseif ($req_method == "DELETE"){//删除已发布的艺术品
         http_response_code(400);
         exit(json_encode(array("message"=>"缺少必要的请求参数！")));
     }
+    $mysql=new Mysql();
+
+    //合法性与权限检查
+    $painting = $mysql->selectAPaintingById($PaintingID);
+    if (!$painting){
+        http_response_code(404);
+        exit(json_encode(array('message'=>'此艺术品不存在！')));
+    }
+    if ($painting->CustomerID_create != $userID){
+        http_response_code(403);
+        exit(json_encode(array('message'=>'您没有权限删除此艺术品！')));
+    }
 
     //删除操作
+    $result = $mysql->delete('paintings', "WHERE PaintingID='$PaintingID'");
+    if (!$result){
+        http_response_code(500);
+        exit(json_encode(array('message'=>"未知错误！")));
+    }
 
     http_response_code(200);
-
+    exit(json_encode(array('message'=>"删除成功！")));
 }
 else{
     http_response_code(405);
