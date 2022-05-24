@@ -77,6 +77,13 @@ class Mysql
         return $this->query($sql);
     }
 
+    public function insert($tableName, $columnNames, $columnValues){
+        $columnNamesSql = $this->columnArrayToSql($columnNames);
+        $columnValuesSql = $this->columnArrayToSqlWithQuo($columnValues);
+        $sql = "INSERT INTO $tableName ($columnNamesSql) VALUES ($columnValuesSql)";
+        return $this->query($sql);
+    }
+
     private function columnArrayToSql($columnNames){
         $n = count($columnNames);
         $columnSql = "";
@@ -84,6 +91,14 @@ class Mysql
             $columnSql = $columnSql . $columnNames[$i] . ",";
         }
         return substr($columnSql, 0, strlen($columnSql)-1);
+    }
+    private function columnArrayToSqlWithQuo($columnNames){
+        $n = count($columnNames);
+        $columnSql = "'";
+        for ($i=0; $i < $n; $i++){
+            $columnSql = $columnSql . $columnNames[$i] . "','";
+        }
+        return substr($columnSql, 0, strlen($columnSql)-2);
     }
 
     public function selectById($columnNames, $tableName, $idName, $idValue){
