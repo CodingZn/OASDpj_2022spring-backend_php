@@ -89,6 +89,12 @@ class Mysql
         return $this->query($sql);
     }
 
+    public function update($tableName, $maps, $condition){
+        $mapSql = $this->mapsToSql($maps);
+        $sql = "UPDATE $tableName SET $mapSql WHERE $condition";
+        return $this->query($sql);
+    }
+
     private function columnArrayToSql($columnNames){
         $n = count($columnNames);
         $columnSql = "";
@@ -104,6 +110,13 @@ class Mysql
             $columnSql = $columnSql . $columnNames[$i] . "','";
         }
         return substr($columnSql, 0, strlen($columnSql)-2);
+    }
+    private function mapsToSql($maps){
+        $mapSql = "";
+        foreach ($maps as $key=>$value){
+            $mapSql = $mapSql . $key . '='. "'$value',";
+        }
+        return substr($mapSql, 0, strlen($mapSql) - 1);
     }
 
     public function selectById($columnNames, $tableName, $idName, $idValue){
