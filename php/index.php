@@ -11,8 +11,10 @@ if ($req_method == "GET"){
 
     $rolling5Pics = getRolling5Pics();
     $newest3Paintings = getNewest3Paintings();
+    $popular3Paintings = getPopular3Paintings();
 
-    $data = array("rolling5Pics"=> $rolling5Pics, "newest3Paintings"=>$newest3Paintings);
+    $data = array("rolling5Pics"=> $rolling5Pics,
+        "newest3Paintings"=>$newest3Paintings, "popular3Paintings"=>$popular3Paintings);
     exit(json_encode($data));
 
 }elseif ($req_method == "POST"){
@@ -42,7 +44,21 @@ function getNewest3Paintings(){
     $mysql = new Mysql();
     $result = $mysql->select($columns, "paintings");
     $rows = mysqli_fetch_all($result, MYSQLI_ASSOC);
-    usort($rows, "sort_by_PaintingID");
+    usort($rows, "sort_by_ReleaseDate");
+    $len = count($rows);
+    for ($i=0;$i<3;$i++){
+        array_push($newest3Paintings, $rows[$len - $i - 1]);
+    }
+    return $newest3Paintings;
+}
+
+function getPopular3Paintings(){
+    $newest3Paintings = array();
+    $columns = array("PaintingID", "ImageFileName", "Title", "MSRP", "Popularity");
+    $mysql = new Mysql();
+    $result = $mysql->select($columns, "paintings");
+    $rows = mysqli_fetch_all($result, MYSQLI_ASSOC);
+    usort($rows, "sort_by_Popularity");
     $len = count($rows);
     for ($i=0;$i<3;$i++){
         array_push($newest3Paintings, $rows[$len - $i - 1]);
@@ -56,5 +72,23 @@ function sort_by_PaintingID($painting1, $painting2){
     if ($painting1["PaintingID"] == $painting2["PaintingID"])
         return 0;
     if ($painting1["PaintingID"] > $painting2["PaintingID"])
+        return 1;
+}
+
+function sort_by_ReleaseDate($painting1, $painting2){
+    if ($painting1["ReleaseDate"] < $painting2["ReleaseDate"])
+        return -1;
+    if ($painting1["ReleaseDate"] == $painting2["ReleaseDate"])
+        return 0;
+    if ($painting1["ReleaseDate"] > $painting2["ReleaseDate"])
+        return 1;
+}
+
+function sort_by_Popularity($painting1, $painting2){
+    if ($painting1["Popularity"] < $painting2["Popularity"])
+        return -1;
+    if ($painting1["Popularity"] == $painting2["Popularity"])
+        return 0;
+    if ($painting1["Popularity"] > $painting2["Popularity"])
         return 1;
 }

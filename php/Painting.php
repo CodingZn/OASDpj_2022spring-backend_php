@@ -8,7 +8,7 @@ class Painting
     public $ArtistName;
     public $MSRP;
     public $Popularity;
-    public $ReleasedDate;
+    public $ReleaseDate;
     public $Status;
     public $CustomerID_create;
     public $YearOfWork;
