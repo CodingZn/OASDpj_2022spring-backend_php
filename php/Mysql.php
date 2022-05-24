@@ -248,6 +248,7 @@ class Mysql
             return (object) $result;
         }
     }
+
     public function selectAReview($RatingID){
         $result = $this->selectOneObjById($this->columnNames_Review_reviews, "reviews", "RatingID", $RatingID);
         if ($result == null){
@@ -256,6 +257,19 @@ class Mysql
             return (object) $result;
         }
     }
+
+    public function selectAllReviewsOfPainting($PaintingID){
+        $columnNames=array('RatingID');
+        $result=$this->select($columnNames, 'reviews', "WHERE PaintingID='$PaintingID'");
+        $reviewIDList = mysqli_fetch_all($result);
+        $reviewList = array();
+        for ($i=0; $i<count($reviewIDList); $i++){
+            $review = $this->selectAReview($reviewIDList[$i]);
+            array_push($reviewList, $review);
+        }
+        return $reviewList;
+    }
+
     public function selectAOrder_raw($OrderID){
         $result = $this->selectOneObjById($this->columnNames_Order_orders, "orders", "OrderID", $OrderID);
         if ($result == null){

@@ -21,12 +21,30 @@ if ($req_method == "GET"){
         exit(json_encode($data));
     }
 
-
     $mysql = new Mysql();
-    $painting = $mysql->selectAPaintingById($PaintingID);
+    $reviews = $mysql->selectAllReviewsOfPainting($PaintingID);
 
-    $data = array("painting" => $painting);
+    $data = array('reviews'=>$reviews);
     exit(json_encode($data));
+
+}
+elseif($req_method == "PATCH"){//点赞或取消
+    $data = json_decode(file_get_contents('php://input'), true);
+
+    $RatingID = $data['RatingID'];
+    $RatingOP = $data['RatingOP'];
+
+    $mysql=new Mysql();
+    $review = $mysql->selectAReview($RatingID);
+    if ($RatingOP > 0)
+        $review->Rating = $review->Rating + 1;
+    else
+        $review->Rating = $review->Rating - 1;
+
+    //save review
+
+}
+elseif($req_method == "DELETE"){//删除评论
 
 }
 else{

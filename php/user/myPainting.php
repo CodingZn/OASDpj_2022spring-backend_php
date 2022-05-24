@@ -22,7 +22,7 @@ if ($req_method == "GET"){//获取自己的艺术品信息，包括已发布和�
         $paintingIDList=$mysql->selectAllPaintingIDofCustomer($userID);
 
         $paintingList=$mysql->selectPartShortPaintingsByIDList($paintingIDList);
-        $data = array('releasedPaintings'=>$paintingList, 'message'=>'操作成功！');
+        $data = array('paintings'=>$paintingList, 'message'=>'操作成功！');
     }
     elseif ($type=='sold'){//查询卖出的所有艺术品，返回订单
 
