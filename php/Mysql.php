@@ -214,6 +214,19 @@ class Mysql
         return mysqli_fetch_all($result);
     }
 
+    public function selectAllPaintingIDofCustomer($CustomerID){
+        $columnNames=array('PaintingID');
+        $result=$this->select($columnNames, 'paintings', "WHERE CustomerID_create='$CustomerID'");
+        return mysqli_fetch_all($result);
+    }
+
+    public function selectAllSoldPaintingIDofCustomer($CustomerID){
+        $columnNames=array('PaintingID');
+        $result=$this->select($columnNames, 'paintings',
+            "WHERE CustomerID_create='$CustomerID' AND Status='sold'");
+        return mysqli_fetch_all($result);
+    }
+
 
     public function selectACustomer($CustomerID){
         $result = $this->selectOneObjById($this->columnNames_Customer_customers, "customers", "CustomerID", $CustomerID);
