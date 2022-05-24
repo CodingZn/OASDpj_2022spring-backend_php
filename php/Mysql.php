@@ -199,6 +199,21 @@ class Mysql
         }
     }
 
+    public function selectPartShortPaintingsByIDList($PaintingIDList){
+        $paintingList = array();
+        for ($i=0;$i<count($PaintingIDList);$i++){
+            $painting = $this->selectAShortPaintingById($PaintingIDList[$i]);
+            array_push($paintingList, $painting);
+        }
+        return $paintingList;
+    }
+
+    public function selectAllPaintingIDinCart($CustomerID){
+        $columnNames=array('PaintingID');
+        $result=$this->select($columnNames, 'customer_cart', "WHERE CustomerID='$CustomerID'");
+        return mysqli_fetch_all($result);
+    }
+
 
     public function selectACustomer($CustomerID){
         $result = $this->selectOneObjById($this->columnNames_Customer_customers, "customers", "CustomerID", $CustomerID);
