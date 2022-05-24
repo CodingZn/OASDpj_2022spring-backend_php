@@ -12,7 +12,7 @@ if (!$userID) {
     exit(json_encode($data));
 }
 
-if ($req_method == "GET"){
+if ($req_method == "GET"){//查找一个艺术品
     if (array_key_exists('PaintingID',$_GET)){
         $PaintingID = $_GET['PaintingID'];
     }
@@ -22,9 +22,9 @@ if ($req_method == "GET"){
     }
 
     $mysql = new Mysql();
-    $reviews = $mysql->selectAPaintingById($PaintingID);
+    $painting = $mysql->selectAPaintingById($PaintingID);
 
-    $data = array('painting'=>$reviews);
+    $data = array('painting'=>$painting);
     exit(json_encode($data));
 
 }
@@ -78,15 +78,27 @@ elseif ($req_method == "POST"){
     http_response_code(200);
     exit(json_encode(array('message'=>"创建成功！")));
 }
-elseif ($req_method == "PATCH"){
+elseif ($req_method == "PUT"){
     if(array_key_exists('PaintingID', $_GET))
         $PaintingID = $_GET['PaintingID'];
     else{
         http_response_code(400);
         exit(json_encode(array("message"=>"缺少必要的请求参数！")));
     }
+    $mysql = new Mysql();
+    $painting = $mysql->selectAPaintingById($PaintingID);
+    if (!$painting){
+        http_response_code(404);
+        exit(json_encode(array('message'=>'此艺术品不存在！')));
+    }
+    if ($painting->CustomerID_create != $userID){
+        http_response_code(403);
+        exit(json_encode(array('message'=>'您没有权限修改此艺术品！')));
+    }
 
-    //修改
+    //similar as post
+
+
     http_response_code(200);
 }
 else{
