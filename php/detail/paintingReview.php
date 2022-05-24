@@ -4,13 +4,6 @@ require_once "../Mysql.php";
 
 $req_method = $_SERVER['REQUEST_METHOD'];
 
-$userID = checkCustomerToken();
-if (!$userID) {
-    $data = array("message"=> "无操作权限！");
-    http_response_code(401);
-    exit(json_encode($data));
-}
-
 if ($req_method == "GET"){
     if (array_key_exists('PaintingID',$_GET)){
 
@@ -28,7 +21,27 @@ if ($req_method == "GET"){
     exit(json_encode($data));
 
 }
+elseif($req_method == "POST"){//创建评论
+    $userID = checkCustomerToken();
+    if (!$userID) {
+        $data = array("message"=> "无操作权限！");
+        http_response_code(401);
+        exit(json_encode($data));
+    }
+
+    $data = json_decode(file_get_contents('php://input'), true);
+
+    //save
+
+}
 elseif($req_method == "PATCH"){//点赞或取消
+    $userID = checkCustomerToken();
+    if (!$userID) {
+        $data = array("message"=> "无操作权限！");
+        http_response_code(401);
+        exit(json_encode($data));
+    }
+
     $data = json_decode(file_get_contents('php://input'), true);
 
     $RatingID = $data['RatingID'];
@@ -45,6 +58,13 @@ elseif($req_method == "PATCH"){//点赞或取消
 
 }
 elseif($req_method == "DELETE"){//删除评论
+    $userID = checkCustomerToken();
+    if (!$userID) {
+        $data = array("message"=> "无操作权限！");
+        http_response_code(401);
+        exit(json_encode($data));
+    }
+
 
 }
 else{
