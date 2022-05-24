@@ -84,6 +84,11 @@ class Mysql
         return $this->query($sql);
     }
 
+    public function delete($tableName, $condition){
+        $sql = "DELETE FROM $tableName $condition";
+        return $this->query($sql);
+    }
+
     private function columnArrayToSql($columnNames){
         $n = count($columnNames);
         $columnSql = "";
@@ -314,6 +319,8 @@ class Mysql
         $result = $this->query($sql);
         return mysqli_fetch_all($result);
     }
+
+    //insert
 
 
 }
