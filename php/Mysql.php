@@ -299,4 +299,6 @@ class Mysql
         $result = $this->query($sql);
         return mysqli_fetch_all($result);
     }
+
+
 }
