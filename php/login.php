@@ -3,38 +3,53 @@
 require_once "header.php";
 require_once "Mysql.php";
 
-$data = json_decode(file_get_contents('php://input'), true);
 
-$username = $data["username"];
-$password = $data["password"];
+$req_method = $_SERVER['REQUEST_METHOD'];
 
-$mysql = new Mysql();
+if ($req_method=="POST"){
 
-$tablename = "customerlogon";
+    $data = json_decode(file_get_contents('php://input'), true);
 
-$sql = "SELECT * FROM $tablename WHERE UserName='$username'";
+    $username = $data["username"];
+    $password = $data["password"];
 
-$result = $mysql->query($sql);
+    $mysql = new Mysql();
+//查找用户名和邮箱
+    $sql = "SELECT CustomerID,UserName FROM customers WHERE UserName='$username' OR Email='$username'";
+    $result = $mysql->query($sql);
+    if (!$result){
+        http_response_code(403);
+        exit(json_encode(array('message'=>'用户不存在！')));
+    }
 
-$row = mysqli_fetch_assoc($result);
+    $user = mysqli_fetch_assoc($result);
+    $CustomerID = $user['CustomerID'];
 
-$CustomerID = $row['CustomerID'];
+//查找密码和盐
+    $sql = "SELECT Pass,Salt FROM customers WHERE CustomerID='$CustomerID'";
+    $result = $mysql->query($sql);
 
-$salt = $row['Salt'];
-$hashed_password = $row['Pass'];
+    $user_logon=mysqli_fetch_assoc($result);
 
-if (crypt($password, $salt) === $hashed_password)
-    $success = true;
-else $success = false;
+    $salt = $user_logon['Salt'];
+    $hashed_password = $user_logon['Pass'];
 
-if ($success){
-    $token = crypt($CustomerID, $salt);
-    $data = array("message" => "登录成功！", "token", $token);
-    $data["user"]=$username;
+    if (crypt($password, $salt) === $hashed_password)
+        $success = true;
+    else $success = false;
+
+    if ($success){
+        $token = crypt($CustomerID, $salt);
+        $data = array("message" => "登录成功！", "token"=> $token);
+        $data["user"]=$username;
+    }
+    else{
+        $data = array("message" => "密码错误！");
+        http_response_code(403);
+    }
+
+    exit(json_encode($data));
 }
 else{
-    $data = array("message" => "用户名或密码错误！");
-    http_response_code(400);
+    http_response_code(405);
 }
-
-exit(json_encode($data));
