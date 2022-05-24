@@ -333,6 +333,12 @@ class Mysql
         return mysqli_fetch_all($result);
     }
 
+    public function getArtists(){
+        $sql = "SELECT ArtistID,LastName FROM artists";
+        $result = $this->query($sql);
+        return mysqli_fetch_all($result);
+    }
+
     //insert
 
 

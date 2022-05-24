@@ -28,6 +28,13 @@ if ($req_method == "GET"){
         exit(json_encode($data));
     }
 
+    if ($property == 'artist'){
+        $mysql = new Mysql();
+        $genres = $mysql->getArtists();
+        $data = array("artists" => $genres);
+        exit(json_encode($data));
+    }
+
 
 }
 else{
