@@ -10,6 +10,18 @@ class Mysql
     private $connect;//数据库连接
     private $select;//架构art连接
 
+    //artistID->artistName
+    private $columnNames_ShortPainting_paintings = array("PaintingID", "ArtistID", "Title",
+        "ImageFileName", "MSRP", "Popularity", "ReleaseDate", "Description", "Status");
+
+    //artistID->artistName, to add: GenreNames, SubjectNames, RatingID
+    private $columnNames_Painting_paintings = array("PaintingID", "ArtistID", "Title",
+        "ImageFileName", "MSRP", "Popularity", "ReleaseDate", "Description", "Status",
+        "CustomerID_create", "YearOfWork", "Width", "Height", "Medium");
+
+    private $columnNames_Customer_customers = array('CustomerID', 'UserName', 'Email', 'Address', 'Phone', 'UserAccount');
+    private $columnNames_Review_reviews = array('RatingID', 'PaintingID', 'ReviewDate', 'Rating', 'Comment');
+
     public function __construct(){
         $this->connect=mysqli_connect($this->servername, $this->username, $this->password, $this->dbname);
         if(!$this->connect){
@@ -86,5 +98,111 @@ class Mysql
             return $row;
         }
 
+    }
+
+    public function selectAPaintingById($PaintingID){
+        $result = $this->selectOneObjById($this->columnNames_Painting_paintings, "paintings", "PaintingID", $PaintingID);
+        if ($result == null){
+            die('无法读取数据！' . mysqli_error($this->connect));
+        }else{
+            $this->artistID2artistName($result);
+            $this->addGenreName($result, $PaintingID);
+            $this->addSubjectNames($result, $PaintingID);
+            return (object) $result;
+        }
+    }
+
+    private function artistID2artistName(&$result){
+        $ArtistID = $result['ArtistID'];
+        $result2 = mysqli_query($this->connect,"SELECT FirstName, LastName FROM 'artists' WHERE 'ArtistID'=$ArtistID");
+        $Artist = mysqli_fetch_assoc($result2);
+        $ArtistName = $Artist['FirstName'].' '.$Artist['LastName'];
+        $result['ArtistName']=$ArtistName;
+
+    }
+
+    private function addGenreName(&$result, $PaintingID){
+        $result2 = mysqli_query($this->connect,"SELECT GenreID FROM 'paintinggenres' WHERE 'PaintingID'=$PaintingID");
+        $GenreIDList = array();
+        $GenreNameList = array();
+        while ($row = mysqli_fetch_assoc($result2)){
+            array_push($GenreIDList, $row['GenreID']);
+        }
+        for ($i=0; $i<count($GenreIDList);$i++){
+            $GenreID=$GenreIDList[$i];
+            $result3 = mysqli_query($this->connect, "SELECT GenreName FROM 'genres' WHERE 'GenreID'=$GenreID");
+            $row = mysqli_fetch_assoc($result3);
+            array_push($GenreNameList, $row['GenreName']);
+        }
+        $result['GenreNames'] = $GenreNameList;
+    }
+
+    private function addSubjectNames(&$result, $PaintingID){
+        $result2 = mysqli_query($this->connect,"SELECT SubjectID FROM 'paintingsubjects' WHERE 'PaintingID'=$PaintingID");
+        $GenreIDList = array();
+        $GenreNameList = array();
+        while ($row = mysqli_fetch_assoc($result2)){
+            array_push($GenreIDList, $row['SubjectID']);
+        }
+        for ($i=0; $i<count($GenreIDList);$i++){
+            $GenreID=$GenreIDList[$i];
+            $result3 = mysqli_query($this->connect, "SELECT SubjectName FROM 'subjects' WHERE 'SubjectID'=$GenreID");
+            $row = mysqli_fetch_assoc($result3);
+            array_push($GenreNameList, $row['SubjectName']);
+        }
+        $result['SubjectNames'] = $GenreNameList;
+    }
+
+
+    public function selectAShortPaintingById($PaintingID){
+        $result = $this->selectOneObjById($this->columnNames_ShortPainting_paintings, "paintings", "PaintingID", $PaintingID);
+        if ($result == null){
+            die('无法读取数据！' . mysqli_error($this->connect));
+        }else{
+            $this->artistID2artistName($result);
+            $this->addGenreName($result, $PaintingID);
+            return (object) $result;
+        }
+    }
+
+    public function selectAllPaintings(){
+        $result = $this->select($this->columnNames_Painting_paintings, "paintings");
+        if ($result == null){
+            die('无法读取数据！' . mysqli_error($this->connect));
+        }else{
+            $this->artistID2artistName($result);
+            $this->addGenreName($result, $result['PaintingID']);
+            $this->addSubjectNames($result, $result['PaintingID']);
+            return (object) $result;
+        }
+    }
+
+    public function selectAllShortPaintings(){
+        $result = $this->select($this->columnNames_ShortPainting_paintings, "paintings");
+        if ($result == null){
+            die('无法读取数据！' . mysqli_error($this->connect));
+        }else{
+            $this->artistID2artistName($result);
+            $this->addGenreName($result, $result['PaintingID']);
+            return (object) $result;
+        }
+    }
+
+
+    public function selectACustomer($CustomerID){
+        $result = $this->selectOneObjById($this->columnNames_Customer_customers, "customers", "CustomerID", $CustomerID);
+        if ($result == null){
+            die('无法读取数据！' . mysqli_error($this->connect));
+        }else{
+            return (object) $result;
+        }
+    }
+    public function selectAReview($RatingID){
+        $result = $this->selectOneObjById($this->columnNames_Review_reviews, "reviews", "RatingID", $RatingID);
+        if ($result == null){
+            die('无法读取数据！' . mysqli_error($this->connect));
+        }else{
+            return (object) $result;
+        }
     }
 }

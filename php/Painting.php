@@ -10,13 +10,13 @@ class Painting
     public $Popularity;
     public $ReleasedDate;
     public $Status;
-    public $Customer_create;//复合属性
+    public $CustomerID_create;
     public $YearOfWork;
     public $Width;
     public $Height;
     public $Medium;
-    public $GenreName;
-    public $SubjectName;
-    public $Review;//复合属性
+    public $GenreNames;
+    public $SubjectNames;
+    public $RatingID;
 
 }
