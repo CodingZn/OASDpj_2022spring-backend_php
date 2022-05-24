@@ -114,7 +114,7 @@ class Mysql
 
     private function artistID2artistName(&$result){
         $ArtistID = $result['ArtistID'];
-        $result2 = mysqli_query($this->connect,"SELECT FirstName, LastName FROM 'artists' WHERE 'ArtistID'=$ArtistID");
+        $result2 = mysqli_query($this->connect,"SELECT FirstName,LastName FROM artists WHERE ArtistID=$ArtistID");
         $Artist = mysqli_fetch_assoc($result2);
         $ArtistName = $Artist['FirstName'].' '.$Artist['LastName'];
         $result['ArtistName']=$ArtistName;
@@ -122,7 +122,7 @@ class Mysql
     }
 
     private function addGenreName(&$result, $PaintingID){
-        $result2 = mysqli_query($this->connect,"SELECT GenreID FROM 'paintinggenres' WHERE 'PaintingID'=$PaintingID");
+        $result2 = mysqli_query($this->connect,"SELECT GenreID FROM paintinggenres WHERE PaintingID=$PaintingID");
         $GenreIDList = array();
         $GenreNameList = array();
         while ($row = mysqli_fetch_assoc($result2)){
@@ -130,7 +130,7 @@ class Mysql
         }
         for ($i=0; $i<count($GenreIDList);$i++){
             $GenreID=$GenreIDList[$i];
-            $result3 = mysqli_query($this->connect, "SELECT GenreName FROM 'genres' WHERE 'GenreID'=$GenreID");
+            $result3 = mysqli_query($this->connect, "SELECT GenreName FROM genres WHERE GenreID=$GenreID");
             $row = mysqli_fetch_assoc($result3);
             array_push($GenreNameList, $row['GenreName']);
         }
@@ -138,7 +138,7 @@ class Mysql
     }
 
     private function addSubjectNames(&$result, $PaintingID){
-        $result2 = mysqli_query($this->connect,"SELECT SubjectID FROM 'paintingsubjects' WHERE 'PaintingID'=$PaintingID");
+        $result2 = mysqli_query($this->connect,"SELECT SubjectID FROM paintingsubjects WHERE PaintingID=$PaintingID");
         $GenreIDList = array();
         $GenreNameList = array();
         while ($row = mysqli_fetch_assoc($result2)){
@@ -146,7 +146,7 @@ class Mysql
         }
         for ($i=0; $i<count($GenreIDList);$i++){
             $GenreID=$GenreIDList[$i];
-            $result3 = mysqli_query($this->connect, "SELECT SubjectName FROM 'subjects' WHERE 'SubjectID'=$GenreID");
+            $result3 = mysqli_query($this->connect, "SELECT SubjectName FROM subjects WHERE SubjectID=$GenreID");
             $row = mysqli_fetch_assoc($result3);
             array_push($GenreNameList, $row['SubjectName']);
         }

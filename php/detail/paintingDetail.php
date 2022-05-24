@@ -22,10 +22,7 @@ if ($req_method == "GET"){
 
 
     $mysql = new Mysql();
-    $columnNames = array('PaintingID', 'Title', 'ArtistID', 'MSRP');//to add
-    $painting = $mysql->selectOneObjById($columnNames,'paintings', 'PaintingID', $PaintingID);
-
-    //process foreign key
+    $painting = $mysql->selectAPaintingById($PaintingID);
 
     $data = array("painting" => $painting);
     exit(json_encode($data));
