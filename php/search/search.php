@@ -30,9 +30,16 @@ if ($req_method == "GET"){//搜索
     else
         $pagesize = "10";
 
+    $mysql = new Mysql();
+    $paintingList = $mysql->selectAllShortPaintings();
+
+    $paintingList = array_slice($paintingList, ($page - 1) * $pagesize,$pagesize,true);
+
+    $data = array('paintings'=>$paintingList, 'message'=>'操作成功！');
 
     http_response_code(200);
 
+    exit(json_encode($data));
 }
 else{
     http_response_code(405);

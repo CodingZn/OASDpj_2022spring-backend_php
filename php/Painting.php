@@ -15,6 +15,7 @@ class Painting
     public $Width;
     public $Height;
     public $Medium;
+    public $Description;
     public $GenreNames;
     public $SubjectNames;
     public $RatingID;

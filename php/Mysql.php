@@ -159,6 +159,7 @@ class Mysql
         if ($result == null){
             die('无法读取数据！' . mysqli_error($this->connect));
         }else{
+            $result['Description'] = substr($result['Description'],0,150);
             $this->artistID2artistName($result);
             $this->addGenreName($result, $PaintingID);
             return (object) $result;
@@ -170,10 +171,14 @@ class Mysql
         if ($result == null){
             die('无法读取数据！' . mysqli_error($this->connect));
         }else{
-            $this->artistID2artistName($result);
-            $this->addGenreName($result, $result['PaintingID']);
-            $this->addSubjectNames($result, $result['PaintingID']);
-            return (object) $result;
+            $paintings = mysqli_fetch_all($result);
+            for($i=0;$i<count($paintings);$i++){
+                $painting = $paintings[$i];
+                $painting['Description'] = substr($painting['Description'],0,150);
+                $painting = (object) $painting;
+                $paintings[$i]=$painting;
+            }
+            return $paintings;
         }
     }
 
@@ -182,9 +187,15 @@ class Mysql
         if ($result == null){
             die('无法读取数据！' . mysqli_error($this->connect));
         }else{
-            $this->artistID2artistName($result);
-            $this->addGenreName($result, $result['PaintingID']);
-            return (object) $result;
+            $paintings = mysqli_fetch_all($result, MYSQLI_ASSOC);
+            for($i=0;$i<count($paintings);$i++){
+                $painting = $paintings[$i];
+                $painting = (object) $painting;
+                $painting->Description = substr($painting->Description,0,150);
+
+                $paintings[$i]=$painting;
+            }
+            return $paintings;
         }
     }
 
