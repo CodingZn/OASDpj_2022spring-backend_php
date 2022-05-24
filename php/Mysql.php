@@ -21,6 +21,8 @@ class Mysql
 
     private $columnNames_Customer_customers = array('CustomerID', 'UserName', 'Email', 'Address', 'Phone', 'UserAccount');
     private $columnNames_Review_reviews = array('RatingID', 'PaintingID', 'ReviewDate', 'Rating', 'Comment');
+    private $columnNames_Order_orders = array('OrderID', 'CustomerID', 'DateStarted', 'PaintingID');
+
 
     public function __construct(){
         $this->connect=mysqli_connect($this->servername, $this->username, $this->password, $this->dbname);
@@ -165,7 +167,7 @@ class Mysql
             return (object) $result;
         }
     }
-
+/*
     public function selectAllPaintings(){
         $result = $this->select($this->columnNames_Painting_paintings, "paintings");
         if ($result == null){
@@ -181,7 +183,7 @@ class Mysql
             return $paintings;
         }
     }
-
+*/
     public function selectAllShortPaintings(){
         $result = $this->select($this->columnNames_ShortPainting_paintings, "paintings");
         if ($result == null){
@@ -208,6 +210,8 @@ class Mysql
         return $paintingList;
     }
 
+    //select ids
+
     public function selectAllPaintingIDinCart($CustomerID){
         $columnNames=array('PaintingID');
         $result=$this->select($columnNames, 'customer_cart', "WHERE CustomerID='$CustomerID'");
@@ -227,6 +231,14 @@ class Mysql
         return mysqli_fetch_all($result);
     }
 
+    public function selectAllOrderIDofCustomer($CustomerID){
+        $columnNames=array('OrderID');
+        $result=$this->select($columnNames, 'orders',
+            "WHERE CustomerID='$CustomerID'");
+        return mysqli_fetch_all($result);
+    }
+
+    //other entity
 
     public function selectACustomer($CustomerID){
         $result = $this->selectOneObjById($this->columnNames_Customer_customers, "customers", "CustomerID", $CustomerID);
@@ -238,6 +250,14 @@ class Mysql
     }
     public function selectAReview($RatingID){
         $result = $this->selectOneObjById($this->columnNames_Review_reviews, "reviews", "RatingID", $RatingID);
+        if ($result == null){
+            die('无法读取数据！' . mysqli_error($this->connect));
+        }else{
+            return (object) $result;
+        }
+    }
+    public function selectAOrder($OrderID){
+        $result = $this->selectOneObjById($this->columnNames_Order_orders, "orders", "OrderID", $OrderID);
         if ($result == null){
             die('无法读取数据！' . mysqli_error($this->connect));
         }else{
