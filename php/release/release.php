@@ -5,9 +5,27 @@ require_once "../checkToken.php";
 
 $req_method = $_SERVER['REQUEST_METHOD'];
 
-if ($req_method == "GET"){
+$userID = checkCustomerToken();
+if (!$userID) {
+    $data = array("message"=> "无操作权限！");
+    http_response_code(401);
+    exit(json_encode($data));
+}
 
-    http_response_code(200);
+if ($req_method == "GET"){
+    if (array_key_exists('PaintingID',$_GET)){
+        $PaintingID = $_GET['PaintingID'];
+    }
+    else {
+        $data = array("message" => "缺少必要参数！");
+        exit(json_encode($data));
+    }
+
+    $mysql = new Mysql();
+    $reviews = $mysql->selectAPaintingById($PaintingID);
+
+    $data = array('painting'=>$reviews);
+    exit(json_encode($data));
 
 }
 elseif ($req_method == "POST"){

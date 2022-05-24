@@ -6,7 +6,6 @@ $req_method = $_SERVER['REQUEST_METHOD'];
 
 if ($req_method == "GET"){
     if (array_key_exists('PaintingID',$_GET)){
-
         $PaintingID = $_GET['PaintingID'];
     }
     else {

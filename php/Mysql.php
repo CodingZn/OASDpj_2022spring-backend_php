@@ -223,14 +223,14 @@ class Mysql
         $result=$this->select($columnNames, 'paintings', "WHERE CustomerID_create='$CustomerID'");
         return mysqli_fetch_all($result);
     }
-
+/*
     public function selectAllSoldPaintingIDofCustomer($CustomerID){
         $columnNames=array('PaintingID');
         $result=$this->select($columnNames, 'paintings',
             "WHERE CustomerID_create='$CustomerID' AND Status='sold'");
         return mysqli_fetch_all($result);
     }
-
+*/
     public function selectAllOrderIDofCustomer($CustomerID){
         $columnNames=array('OrderID');
         $result=$this->select($columnNames, 'orders',
@@ -278,10 +278,25 @@ class Mysql
             return (object) $result;
         }
     }
+
     public function selectAOrder_full($OrderID){
         $order = $this->selectAOrder_raw($OrderID);
         $order->Painting = $this->selectAPaintingById($order->PaintingID);
         $order->Customer = $this->selectACustomer($order->CustomerID);
         return $order;
+    }
+
+
+    //get values
+    public function getGenres(){
+        $sql = "SELECT GenreID,GenreName FROM genres";
+        $result = $this->query($sql);
+        return mysqli_fetch_all($result);
+    }
+
+    public function getSubjects(){
+        $sql = "SELECT SubjectID,SubjectName FROM subjects";
+        $result = $this->query($sql);
+        return mysqli_fetch_all($result);
     }
 }

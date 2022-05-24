@@ -13,7 +13,6 @@ if (!$userID) {
 
 if ($req_method == "GET"){
     if (array_key_exists('PaintingID',$_GET)){
-
         $PaintingID = $_GET['PaintingID'];
     }
     else {
