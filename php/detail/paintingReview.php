@@ -71,9 +71,8 @@ elseif($req_method == "PATCH"){//点赞或取消
     }
 
     //save
-    $columnNames=array('Rating');
-    $columnValues=array($rating);
-    $mysql->insert('reviews', $columnNames, $columnValues);
+    $maps = array('Rating'=>$rating);
+    $mysql->update('reviews', $maps, "WHERE RatingID='$RatingID'");
 
     exit();
 
