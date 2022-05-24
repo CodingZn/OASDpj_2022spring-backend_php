@@ -3,46 +3,80 @@
 require_once "header.php";
 require_once "Mysql.php";
 
-$data = json_decode(file_get_contents('php://input'), true);
+$req_method = $_SERVER['REQUEST_METHOD'];
 
-$username = $data["username"];
-$phone = $data["phone"];
-$address = $data["address"];
-$email = $data["email"];
-$password = $data["password"];
+if ($req_method=="POST"){
 
-if (!checkFormats()){
-    $data = array("message" => "信息格式有误！");
-    http_response_code(400);
-    exit(json_encode($data));
-}
+    $data = json_decode(file_get_contents('php://input'), true);
 
-$salt = md5(rand());
-$hashed_password = crypt($password, $salt);
+    $username = $data["username"];
+    $phone = $data["phone"];
+    $address = $data["address"];
+    $email = $data["email"];
+    $password = $data["password"];
 
+    $mysql=new Mysql();
+//检查表单格式
+    if (!checkFormats()){
+        $data = array("message" => "信息格式有误！");
+        http_response_code(400);
+        exit(json_encode($data));
+    }
+//检查用户名或邮箱是否已经存在
+    $sql = "SELECT CustomerID FROM customers WHERE UserName='$username'";
+    $result = $mysql->query($sql);
+    if (!$result){
+        $data = array("message" => "用户名已存在！");
+        http_response_code(400);
+        exit(json_encode($data));
+    }
+    $sql = "SELECT CustomerID FROM customers WHERE Email='$email'";
+    $result = $mysql->query($sql);
+    if (!$result){
+        $data = array("message" => "邮箱已存在！");
+        http_response_code(400);
+        exit(json_encode($data));
+    }
 
-$mysql = new Mysql();
+    //生成盐和加密密码
+    $salt = md5(rand());
+    $hashed_password = crypt($password, $salt);
 
-$tablename = 'customerlogon';
+    //在logon表中加入相应信息，并获取ID
+    $sql = "INSERT INTO customerlogon ".
+        "(Pass, Salt) ".
+        "VALUES ".
+        "('$hashed_password', '$salt')";
 
-$sql = "INSERT INTO $tablename ".
-    "(UserName, Pass, Salt) ".
-    "VALUES ".
-    "('$username','$hashed_password', '$salt')";
+    $result = $mysql->query($sql);
+    if (!$result){
+        $data = array("message" => "未知原因，注册失败！");
+        http_response_code(500);
+        exit(json_encode($data));
+    }
 
-$result = $mysql->query($sql);
+    $CustomerID = mysqli_fetch_assoc($result)['CustomerID'];
 
+//向customers表里插入数据
+    $sql = "INSERT INTO customers ".
+        "(CustomerID, UserName, Email, Address, Phone) ".
+        "VALUES ".
+        "($CustomerID, $username, $email, $address, $phone)";
 
-if ($result){
+    $result = $mysql->query($sql);
+    if (!$result){
+        $data = array("message" => "未知原因，注册失败！");
+        http_response_code(500);
+        exit(json_encode($data));
+    }
+
     $data = array("message" => "注册成功！");
+    exit(json_encode($data));
+
 }
 else{
-    $data = array("message" => "注册失败！");
-    http_response_code(400);
+    http_response_code(405);
 }
-
-exit(json_encode($data));
-
 
 function checkFormats(){
     global $address, $email, $password, $phone, $username;
