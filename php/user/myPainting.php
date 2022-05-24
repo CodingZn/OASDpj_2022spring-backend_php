@@ -22,19 +22,25 @@ if ($req_method == "GET"){//获取自己的艺术品信息，包括已发布和�
         $paintingIDList=$mysql->selectAllPaintingIDofCustomer($userID);
 
         $paintingList=$mysql->selectPartShortPaintingsByIDList($paintingIDList);
+        $data = array('releasedPaintings'=>$paintingList, 'message'=>'操作成功！');
     }
-    elseif ($type=='sold'){
+    elseif ($type=='sold'){//查询卖出的所有艺术品，返回订单
+
         $mysql = new Mysql();
-        $soldPaintingIDList=$mysql->selectAllSoldPaintingIDofCustomer($userID);
-        $soldPaintingList=$mysql->selectPartShortPaintingsByIDList($soldPaintingIDList);
-//订单时间、购买人信息
+        $orderIDList = $mysql->selectAllOrderIDofCustomer($userID);
+        $orderList = array();
+        for ($i=0; $i<count($orderIDList);$i++){
+            $order = $mysql->selectAOrder_full($orderIDList[$i]);
+            array_push($orderList, $order);
+        }
+
+        $data = array('orders'=>$orderList, 'message'=>'操作成功！');
     }
     else{
         http_response_code(400);
         exit(json_encode(array('message'=>'请求参数错误！')));
     }
 
-    $data = array('releasedPaintings'=>$paintingList, 'message'=>'操作成功！');
     http_response_code(200);
 
     exit(json_encode($data));

@@ -256,12 +256,18 @@ class Mysql
             return (object) $result;
         }
     }
-    public function selectAOrder($OrderID){
+    public function selectAOrder_raw($OrderID){
         $result = $this->selectOneObjById($this->columnNames_Order_orders, "orders", "OrderID", $OrderID);
         if ($result == null){
             die('无法读取数据！' . mysqli_error($this->connect));
         }else{
             return (object) $result;
         }
+    }
+    public function selectAOrder_full($OrderID){
+        $order = $this->selectAOrder_raw($OrderID);
+        $order->Painting = $this->selectAPaintingById($order->PaintingID);
+        $order->Customer = $this->selectACustomer($order->CustomerID);
+        return $order;
     }
 }

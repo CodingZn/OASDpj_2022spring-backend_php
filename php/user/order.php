@@ -18,7 +18,7 @@ if ($req_method == "GET"){//获取自己的订单信息
     $orderIDList = $mysql->selectAllOrderIDofCustomer($userID);
     $orderList=array();
     for ($i=0;$i<count($orderIDList);$i++){
-        array_push($orderList, $mysql->selectAOrder($orderIDList[$i]));
+        array_push($orderList, $mysql->selectAOrder_full($orderIDList[$i]));
     }
     $data=array('orderList'=>$orderList);
 
