@@ -82,7 +82,7 @@ elseif ($req_method == "POST"){
     $GenreID = $data['GenreID'];
     $MSRP = $data['MSRP'];
 
-    $ImageFileName = 1;//generated
+    $ImageFileName = str_pad($PaintingID, 6, '0', STR_PAD_LEFT);
 
     $columnNames = array('ArtistID', 'Title', 'Description',
         'YearOfWork', 'Width', 'Height', 'GenreID', 'MSRP',
@@ -133,14 +133,10 @@ elseif ($req_method == "PUT"){
     $GenreID = $data['GenreID'];
     $MSRP = $data['MSRP'];
 
-    $ImageFileName = 1;//generated
-
     $columnNames = array('ArtistID', 'Title', 'Description',
-        'YearOfWork', 'Width', 'Height', 'GenreID', 'MSRP',
-        'ImageFileName');
+        'YearOfWork', 'Width', 'Height', 'GenreID', 'MSRP');
     $columnValues = array($ArtistID, $Title, $Description,
-        $YearOfWork, $Width, $Height, $GenreID, $MSRP,
-        $ImageFileName);
+        $YearOfWork, $Width, $Height, $GenreID, $MSRP);
 
     $maps = array_combine($columnNames, $columnValues);
 
