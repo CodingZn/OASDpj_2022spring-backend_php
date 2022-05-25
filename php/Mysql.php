@@ -59,7 +59,8 @@ class Mysql
     public function query($sql){
         $result = mysqli_query($this->connect, $sql);
         if ($result === false){
-            die('无法读取数据！' . mysqli_error($this->connect));
+//            die('无法读取数据！' . mysqli_error($this->connect));
+            return false;
         }
         else{
             return $result;
@@ -74,14 +75,22 @@ class Mysql
             $columnSql = $this->columnArrayToSql($columnNames);
         }
         $sql = "SELECT $columnSql FROM $tableName $condition";
-        return $this->query($sql);
+        $result = $this->query($sql);
+        if (!$result || $result->num_rows == 0){
+            return false;
+        }
+        else return $result;
     }
 
     public function insert($tableName, $columnNames, $columnValues){
         $columnNamesSql = $this->columnArrayToSql($columnNames);
         $columnValuesSql = $this->columnArrayToSqlWithQuo($columnValues);
         $sql = "INSERT INTO $tableName ($columnNamesSql) VALUES ($columnValuesSql)";
-        return $this->query($sql);
+        $result = $this->query($sql);
+        if (!$result) return false;
+        $sql = "SELECT LAST_INSERT_ID()";
+        $result = $this->query($sql);
+        return $result;
     }
 
     public function delete($tableName, $condition){

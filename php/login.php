@@ -15,19 +15,21 @@ if ($req_method=="POST"){
 
     $mysql = new Mysql();
 //查找用户名和邮箱
-    $sql = "SELECT CustomerID,UserName FROM customers WHERE UserName='$username' OR Email='$username'";
-    $result = $mysql->query($sql);
+    $columnNames = array('CustomerID','UserName');
+    $tablename = 'customers';
+    $condition = "WHERE UserName='$username' OR Email='$username'";
+    $result = $mysql->select($columnNames, $tablename, $condition);
     if (!$result){
         http_response_code(403);
         exit(json_encode(array('message'=>'用户不存在！')));
     }
 
     $user = mysqli_fetch_assoc($result);
+
     $CustomerID = $user['CustomerID'];
 
 //查找密码和盐
-    $sql = "SELECT Pass,Salt FROM customers WHERE CustomerID='$CustomerID'";
-    $result = $mysql->query($sql);
+    $result = $mysql->select(array('Pass', 'Salt'), 'customerlogon', "WHERE CustomerID='$CustomerID'");
 
     $user_logon=mysqli_fetch_assoc($result);
 
@@ -41,7 +43,8 @@ if ($req_method=="POST"){
     if ($success){
         $token = crypt($CustomerID, $salt);
         $data = array("message" => "登录成功！", "token"=> $token);
-        $data["user"]=$username;
+        $data["username"]=$username;
+        $data['CustomerID']=$CustomerID;
     }
     else{
         $data = array("message" => "密码错误！");

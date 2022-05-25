@@ -23,16 +23,14 @@ if ($req_method=="POST"){
         exit(json_encode($data));
     }
 //检查用户名或邮箱是否已经存在
-    $sql = "SELECT CustomerID FROM customers WHERE UserName='$username'";
-    $result = $mysql->query($sql);
-    if (!$result){
+    $result = $mysql->select(array('CustomerID'), 'customers', "WHERE UserName='$username'");
+    if ($result){
         $data = array("message" => "用户名已存在！");
         http_response_code(400);
         exit(json_encode($data));
     }
-    $sql = "SELECT CustomerID FROM customers WHERE Email='$email'";
-    $result = $mysql->query($sql);
-    if (!$result){
+    $result = $mysql->select(array('CustomerID'), 'customers', "WHERE Email='$email'");
+    if ($result){
         $data = array("message" => "邮箱已存在！");
         http_response_code(400);
         exit(json_encode($data));
@@ -43,27 +41,22 @@ if ($req_method=="POST"){
     $hashed_password = crypt($password, $salt);
 
     //在logon表中加入相应信息，并获取ID
-    $sql = "INSERT INTO customerlogon ".
-        "(Pass, Salt) ".
-        "VALUES ".
-        "('$hashed_password', '$salt')";
-
-    $result = $mysql->query($sql);
+    $columnNames = array('Pass', 'Salt');
+    $columnValues = array($hashed_password, $salt);
+    $result = $mysql->insert('customerlogon', $columnNames, $columnValues);
     if (!$result){
         $data = array("message" => "未知原因，注册失败！");
         http_response_code(500);
         exit(json_encode($data));
     }
 
-    $CustomerID = mysqli_fetch_assoc($result)['CustomerID'];
+    $row = mysqli_fetch_assoc($result);
+    $CustomerID = $row['LAST_INSERT_ID()'];
 
 //向customers表里插入数据
-    $sql = "INSERT INTO customers ".
-        "(CustomerID, UserName, Email, Address, Phone) ".
-        "VALUES ".
-        "($CustomerID, $username, $email, $address, $phone)";
-
-    $result = $mysql->query($sql);
+    $columnNames = array('CustomerID', 'UserName', 'Email', 'Address', 'Phone');
+    $columnValues = array($CustomerID, $username, $email, $address, $phone);
+    $result = $mysql->insert('customers', $columnNames, $columnValues);
     if (!$result){
         $data = array("message" => "未知原因，注册失败！");
         http_response_code(500);
