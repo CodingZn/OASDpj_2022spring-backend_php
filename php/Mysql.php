@@ -21,7 +21,7 @@ class Mysql
 
     private $columnNames_Customer_customers = array('CustomerID', 'UserName', 'Email', 'Address', 'Phone', 'UserAccount');
     private $columnNames_Review_reviews = array('RatingID', 'PaintingID','CustomerID', 'CreateDateTime', 'Rating', 'Comment');
-    private $columnNames_Order_orders = array('OrderID', 'CustomerID', 'DateStarted', 'PaintingID');
+    private $columnNames_Order_orders = array('OrderID', 'CustomerID', 'DateCreated', 'PaintingID');
 
 
     public function __construct(){
@@ -146,7 +146,7 @@ class Mysql
 
     public function selectAPaintingById($PaintingID){
         $result = $this->selectOneObjById($this->columnNames_Painting_paintings, "paintings", "PaintingID", $PaintingID);
-        if ($result == null){
+        if (!$result){
             return false;
         }else{
             $this->artistID2artistName($result);
@@ -241,12 +241,14 @@ class Mysql
     public function selectAllPaintingIDinCart($CustomerID){
         $columnNames=array('PaintingID');
         $result=$this->select($columnNames, 'customer_cart', "WHERE CustomerID='$CustomerID'");
+        if (!$result) return array();
         return mysqli_fetch_all($result);
     }
 
     public function selectAllPaintingIDofCustomer($CustomerID){
         $columnNames=array('PaintingID');
         $result=$this->select($columnNames, 'paintings', "WHERE CustomerID_create='$CustomerID'");
+        if (!$result) return array();
         return mysqli_fetch_all($result);
     }
 
@@ -254,6 +256,7 @@ class Mysql
         $columnNames=array('OrderID');
         $result=$this->select($columnNames, 'orders',
             "WHERE CustomerID='$CustomerID'");
+        if (!$result) return array();
         return mysqli_fetch_all($result);
     }
 
@@ -300,7 +303,7 @@ class Mysql
 
     public function selectAOrder_full($OrderID){
         $order = $this->selectAOrder_raw($OrderID);
-        $order->Painting = $this->selectAPaintingById($order->PaintingID);
+        $order->Painting = $this->selectAShortPaintingById($order->PaintingID);
         $order->Customer = $this->selectACustomer($order->CustomerID);
         return $order;
     }

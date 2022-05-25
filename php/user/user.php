@@ -28,7 +28,7 @@ elseif ($req_method == "POST"){//充值
     $user = $mysql->selectACustomer($userID);
     $account = $user->UserAccount;
 
-    $amount = $data['amount'];var_dump($amount);
+    $amount = $data['amount'];
     if ($amount > 1000 || $amount <= 0){
         http_response_code(400);
         exit(json_encode(array('message'=>"充值金额只能为1000以内的正整数！")));
