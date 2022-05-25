@@ -101,7 +101,6 @@ elseif ($req_method == "POST"){
     $YearOfWork = $data['YearOfWork'];
     $Width = $data['Width'];
     $Height = $data['Height'];
-    $GenreIDs = $data['GenreID'];
     $MSRP = $data['MSRP'];
 
     $columnNames = array('ArtistID', 'Title', 'Description',
@@ -161,7 +160,6 @@ elseif ($req_method == "PUT"){
     $YearOfWork = $data['YearOfWork'];
     $Width = $data['Width'];
     $Height = $data['Height'];
-    $GenreIDs = $data['GenreID'];
     $MSRP = $data['MSRP'];
 
     $columnNames = array('ArtistID', 'Title', 'Description',
