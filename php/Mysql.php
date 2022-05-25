@@ -100,7 +100,7 @@ class Mysql
 
     public function update($tableName, $maps, $condition){
         $mapSql = $this->mapsToSql($maps);
-        $sql = "UPDATE $tableName SET $mapSql WHERE $condition";
+        $sql = "UPDATE $tableName SET $mapSql $condition";
         return $this->query($sql);
     }
 
