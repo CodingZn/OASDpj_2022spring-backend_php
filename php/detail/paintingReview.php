@@ -1,6 +1,7 @@
 <?php
 require_once "../header.php";
 require_once "../Mysql.php";
+require_once "../checkToken.php";
 
 $req_method = $_SERVER['REQUEST_METHOD'];
 

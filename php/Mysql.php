@@ -20,7 +20,7 @@ class Mysql
         "CustomerID_create", "YearOfWork", "Width", "Height", "Medium");
 
     private $columnNames_Customer_customers = array('CustomerID', 'UserName', 'Email', 'Address', 'Phone', 'UserAccount');
-    private $columnNames_Review_reviews = array('RatingID', 'PaintingID', 'ReviewDate', 'Rating', 'Comment');
+    private $columnNames_Review_reviews = array('RatingID', 'PaintingID','CustomerID', 'CreateDateTime', 'Rating', 'Comment');
     private $columnNames_Order_orders = array('OrderID', 'CustomerID', 'DateStarted', 'PaintingID');
 
 
@@ -283,7 +283,7 @@ class Mysql
         $reviewIDList = mysqli_fetch_all($result);
         $reviewList = array();
         for ($i=0; $i<count($reviewIDList); $i++){
-            $review = $this->selectAReview($reviewIDList[$i]);
+            $review = $this->selectAReview($reviewIDList[$i][0]);
             array_push($reviewList, $review);
         }
         return $reviewList;
