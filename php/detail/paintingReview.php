@@ -97,22 +97,22 @@ elseif($req_method == "DELETE"){//删除评论
     $mysql=new Mysql();
 
     //检查权限
-    $result = $mysql->select("RatingID", 'reviews',
+    $result = $mysql->select(array('RatingID'), 'reviews',
         "WHERE RatingID='$RatingID'");
     if (!$result){
         http_response_code(400);
         $data=array('message'=>"该评论不存在！");
         exit(json_encode($data));
     }
-    $result = $mysql->select("RatingID", 'reviews',
-        "WHERE RatingID='$RatingID' AND CustomerID='$userID");
+    $result = $mysql->select(array('RatingID'), 'reviews',
+        "WHERE RatingID='$RatingID' AND CustomerID='$userID'");
     if (!$result){
         http_response_code(403);
         $data=array('message'=>"不能删除别人的评论！");
         exit(json_encode($data));
     }
 
-    $mysql->delete('RatingID', "WHERE RatingID='$RatingID'");
+    $mysql->delete('reviews', "WHERE RatingID='$RatingID'");
 
     $data=array('message'=>"删除成功！");
     exit(json_encode($data));
