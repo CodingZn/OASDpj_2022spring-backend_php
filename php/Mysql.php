@@ -149,14 +149,14 @@ class Mysql
         if (!$result){
             return false;
         }else{
-            $this->artistID2artistName($result);
+            $this->addArtistName($result);
             $this->addGenreName($result, $PaintingID);
             $this->addSubjectNames($result, $PaintingID);
             return (object) $result;
         }
     }
 
-    private function artistID2artistName(&$result){
+    private function addArtistName(&$result){
         $ArtistID = $result['ArtistID'];
         $result2 = mysqli_query($this->connect,"SELECT FirstName,LastName FROM artists WHERE ArtistID=$ArtistID");
         $Artist = mysqli_fetch_assoc($result2);
@@ -204,8 +204,9 @@ class Mysql
             return false;
         }else{
             $result['Description'] = substr($result['Description'],0,150);
-            $this->artistID2artistName($result);
+            $this->addArtistName($result);
             $this->addGenreName($result, $PaintingID);
+            $this->addSubjectNames($result, $PaintingID);
             return (object) $result;
         }
     }

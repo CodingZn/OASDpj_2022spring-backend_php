@@ -12,10 +12,10 @@ if (!$userID) {
     exit(json_encode($data));
 }
 
-//判断新增艺术家或从已有里选择，获取ArtistID
+//判断新增艺术家或从已有里选择，获取ArtistID，只能单选
 function getOrCreateArtist($data, Mysql $mysql)
 {
-    if (array_key_exists('ArtistID', $data)) {//表单中存在，为已有
+    if (!array_key_exists('ArtistName', $data)) {//表单中不存在新name，为已有
         $ArtistID = $data['ArtistID'];
     } else {//新增一个Artist，仅包括Name
         $ArtistName = $data['ArtistName'];
@@ -23,25 +23,53 @@ function getOrCreateArtist($data, Mysql $mysql)
         $columnNames = array('FirstName', 'LastName');
         $columnValues = array('', $ArtistName);
         $result = $mysql->insert('artists', $columnNames, $columnValues);
-        $ArtistID = mysqli_fetch_assoc($result)['ArtistID'];
+        $ArtistID = mysqli_fetch_assoc($result)['LAST_INSERT_ID()'];
     }
     return $ArtistID;
 }
 
-//判断新增流派或从已有里选择，获取GenreID
+//判断新增流派或从已有里选择，获取GenreID，可以多选，返回数组
 function getOrCreateGenre($data, Mysql $mysql)
 {
-    if (array_key_exists('GenreID', $data)) {//表单中存在，为已有
-        $GenreID = $data['GenreID'];
-    } else {//新增一个Genre，仅包括Name
+    $GenreIDList = array();
+    if (!array_key_exists('GenreName', $data)) {//表单中不存在name，为已有
+        $GenreIDList = $data['GenreID'];
+    } else {
+        if (array_key_exists('GenreID', $data)){
+            $GenreIDList = $data['GenreID'];
+        }
+        //新增一个Genre，仅包括Name
         $GenreName = $data['GenreName'];
         //create genre with name
         $columnNames = array('GenreName');
         $columnValues = array($GenreName);
         $result = $mysql->insert('genres', $columnNames, $columnValues);
-        $GenreID = mysqli_fetch_assoc($result)['GenreID'];
+        $GenreID = mysqli_fetch_assoc($result)['LAST_INSERT_ID()'];
+        array_push($GenreIDList, $GenreID);
     }
-    return $GenreID;
+    return $GenreIDList;
+}
+
+//判断新增主题或从已有里选择，获取SubjectID，可以多选，返回数组
+function getOrCreateSubject($data, Mysql $mysql)
+{
+    $SubjectIDList = array();
+    if (!array_key_exists('SubjectName', $data)) {//表单中不存在name，为已有
+        $SubjectIDList = $data['SubjectID'];
+    } else {
+        if (array_key_exists('SubjectID', $data)){
+            $SubjectIDList = $data['SubjectID'];
+        }
+        //新增一个Subject，仅包括Name
+        $SubjectName = $data['SubjectName'];
+        //create genre with name
+        $columnNames = array('SubjectName');
+        $columnValues = array($SubjectName);
+        $result = $mysql->insert('subjects', $columnNames, $columnValues);
+        $SubjectID = mysqli_fetch_assoc($result)['LAST_INSERT_ID()'];
+        array_push($SubjectIDList, $SubjectID);
+    }
+    return $SubjectIDList;
 }
 
 if ($req_method == "GET"){//查找一个艺术品
@@ -72,26 +100,33 @@ elseif ($req_method == "POST"){
     $data = json_decode(file_get_contents('php://input'), true);
     $mysql = new Mysql();
     $ArtistID = getOrCreateArtist($data, $mysql);
-    $GenreID = getOrCreateGenre($data, $mysql);
+    $GenreIDs = getOrCreateGenre($data, $mysql);
+    $SubjectIDs = getOrCreateSubject($data, $mysql);
 
     $Title = $data['Title'];
     $Description = $data['Description'];
     $YearOfWork = $data['YearOfWork'];
     $Width = $data['Width'];
     $Height = $data['Height'];
-    $GenreID = $data['GenreID'];
+    $GenreIDs = $data['GenreID'];
     $MSRP = $data['MSRP'];
 
     $ImageFileName = str_pad($PaintingID, 6, '0', STR_PAD_LEFT);
 
     $columnNames = array('ArtistID', 'Title', 'Description',
-        'YearOfWork', 'Width', 'Height', 'GenreID', 'MSRP',
+        'YearOfWork', 'Width', 'Height', 'MSRP',
         'ImageFileName');
     $columnValues = array($ArtistID, $Title, $Description,
-        $YearOfWork, $Width, $Height, $GenreID, $MSRP,
+        $YearOfWork, $Width, $Height, $MSRP,
         $ImageFileName);
 
     $result = $mysql->insert('paintings', $columnNames, $columnValues);
+    foreach ($GenreIDs as $GenreID){
+        $mysql->insert('paintinggenres', array('PaintingID', 'GenreID'), array($PaintingID, $GenreID));
+    }
+    foreach ($SubjectIDs as $SubjectID){
+        $mysql->insert('paintingsubjects', array('PaintingID', 'SubjectID'), array($PaintingID, $SubjectID));
+    }
 
     if (!$result){
         http_response_code(500);
@@ -123,20 +158,20 @@ elseif ($req_method == "PUT"){
     $data = json_decode(file_get_contents('php://input'), true);
     $mysql = new Mysql();
     $ArtistID = getOrCreateArtist($data, $mysql);
-    $GenreID = getOrCreateGenre($data, $mysql);
+    $GenreIDs = getOrCreateGenre($data, $mysql);
 
     $Title = $data['Title'];
     $Description = $data['Description'];
     $YearOfWork = $data['YearOfWork'];
     $Width = $data['Width'];
     $Height = $data['Height'];
-    $GenreID = $data['GenreID'];
+    $GenreIDs = $data['GenreID'];
     $MSRP = $data['MSRP'];
 
     $columnNames = array('ArtistID', 'Title', 'Description',
         'YearOfWork', 'Width', 'Height', 'GenreID', 'MSRP');
     $columnValues = array($ArtistID, $Title, $Description,
-        $YearOfWork, $Width, $Height, $GenreID, $MSRP);
+        $YearOfWork, $Width, $Height, $GenreIDs, $MSRP);
 
     $maps = array_combine($columnNames, $columnValues);
 
