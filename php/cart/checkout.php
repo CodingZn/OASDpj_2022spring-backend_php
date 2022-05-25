@@ -32,7 +32,7 @@ if ($req_method == "POST"){//下单并付款
     foreach ($paintingIDList as $PaintingID) {
         $PaintingID = $PaintingID[0];
         //查找状态
-        $painting = $mysql->selectAPaintingById($PaintingID);var_dump($painting);
+        $painting = $mysql->selectAPaintingById($PaintingID);
         if ($painting->Status !== 'released'){
             http_response_code(400);
             exit(json_encode(array('message'=>"艺术品 $painting->Title 已售出！")));
