@@ -89,13 +89,6 @@ if ($req_method == "GET"){//查找一个艺术品
 
 }
 elseif ($req_method == "POST"){
-    if(array_key_exists('PaintingID', $_GET))
-        $PaintingID = $_GET['PaintingID'];
-    else{
-        http_response_code(400);
-    exit(json_encode(array("message"=>"缺少必要的请求参数！")));
-}
-
 //获取表单
     $data = json_decode(file_get_contents('php://input'), true);
     $mysql = new Mysql();
@@ -111,16 +104,18 @@ elseif ($req_method == "POST"){
     $GenreIDs = $data['GenreID'];
     $MSRP = $data['MSRP'];
 
-    $ImageFileName = str_pad($PaintingID, 6, '0', STR_PAD_LEFT);
-
     $columnNames = array('ArtistID', 'Title', 'Description',
-        'YearOfWork', 'Width', 'Height', 'MSRP',
-        'ImageFileName');
+        'YearOfWork', 'Width', 'Height', 'MSRP');
     $columnValues = array($ArtistID, $Title, $Description,
-        $YearOfWork, $Width, $Height, $MSRP,
-        $ImageFileName);
+        $YearOfWork, $Width, $Height, $MSRP);
 
     $result = $mysql->insert('paintings', $columnNames, $columnValues);
+    $PaintingID = mysqli_fetch_assoc($result)['LAST_INSERT_ID()'];
+
+    $ImageFileName = str_pad($PaintingID, 6, '0', STR_PAD_LEFT);
+    $map = array('ImageFileName'=>$ImageFileName);
+    $mysql->update('paintings', $map, "WHERE PaintingID='$PaintingID'");
+
     foreach ($GenreIDs as $GenreID){
         $mysql->insert('paintinggenres', array('PaintingID', 'GenreID'), array($PaintingID, $GenreID));
     }
@@ -134,7 +129,7 @@ elseif ($req_method == "POST"){
     }
 
     http_response_code(200);
-    exit(json_encode(array('message'=>"创建成功！")));
+    exit(json_encode(array('PaintingID'=>$PaintingID)));
 }
 elseif ($req_method == "PUT"){
     if(array_key_exists('PaintingID', $_GET))
@@ -154,11 +149,12 @@ elseif ($req_method == "PUT"){
         exit(json_encode(array('message'=>'您没有权限修改此艺术品！')));
     }
 
-    //similar as post
+//获取表单
     $data = json_decode(file_get_contents('php://input'), true);
     $mysql = new Mysql();
     $ArtistID = getOrCreateArtist($data, $mysql);
     $GenreIDs = getOrCreateGenre($data, $mysql);
+    $SubjectIDs = getOrCreateSubject($data, $mysql);
 
     $Title = $data['Title'];
     $Description = $data['Description'];
@@ -169,9 +165,9 @@ elseif ($req_method == "PUT"){
     $MSRP = $data['MSRP'];
 
     $columnNames = array('ArtistID', 'Title', 'Description',
-        'YearOfWork', 'Width', 'Height', 'GenreID', 'MSRP');
+        'YearOfWork', 'Width', 'Height', 'MSRP');
     $columnValues = array($ArtistID, $Title, $Description,
-        $YearOfWork, $Width, $Height, $GenreIDs, $MSRP);
+        $YearOfWork, $Width, $Height, $MSRP);
 
     $maps = array_combine($columnNames, $columnValues);
 
@@ -181,8 +177,9 @@ elseif ($req_method == "PUT"){
         http_response_code(500);
         exit(json_encode(array('message'=>"未知错误！")));
     }
+
     http_response_code(200);
-    exit(json_encode(array('message'=>"修改成功！")));
+    exit(json_encode(array('PaintingID'=>$PaintingID)));
 }
 else{
     http_response_code(405);
