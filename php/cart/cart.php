@@ -33,6 +33,14 @@ elseif ($req_method == "POST"){//将一个商品添加到购物车
 
     $columnNames=array('CustomerID', 'PaintingID');
     $columnValues=array($userID, $PaintingID);
+
+    //查找状态
+    $painting = $mysql->selectAPaintingById($PaintingID);
+    if ($painting->Status !== 'released'){
+        http_response_code(400);
+        exit(json_encode(array('message'=>"艺术品 $painting->Title 已售出！")));
+    }
+
 //检查是否已经添加到购物车
     $result = $mysql->select($columnNames, 'customer_cart',
         "WHERE CustomerID='$userID' AND PaintingID='$PaintingID'");
