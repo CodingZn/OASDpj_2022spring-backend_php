@@ -136,7 +136,7 @@ class Mysql
     public function selectOneObjById($columnNames, $tableName, $idName, $idValue){
         $result = $this->selectById($columnNames, $tableName, $idName, $idValue);
         if ($result === false){
-            die('无法读取数据！' . mysqli_error($this->connect));
+            return $result;
         }else{
             $row = mysqli_fetch_assoc($result);
             return $row;
@@ -147,7 +147,7 @@ class Mysql
     public function selectAPaintingById($PaintingID){
         $result = $this->selectOneObjById($this->columnNames_Painting_paintings, "paintings", "PaintingID", $PaintingID);
         if ($result == null){
-            die('无法读取数据！' . mysqli_error($this->connect));
+            return false;
         }else{
             $this->artistID2artistName($result);
             $this->addGenreName($result, $PaintingID);
@@ -201,7 +201,7 @@ class Mysql
     public function selectAShortPaintingById($PaintingID){
         $result = $this->selectOneObjById($this->columnNames_ShortPainting_paintings, "paintings", "PaintingID", $PaintingID);
         if ($result == null){
-            die('无法读取数据！' . mysqli_error($this->connect));
+            return false;
         }else{
             $result['Description'] = substr($result['Description'],0,150);
             $this->artistID2artistName($result);
@@ -209,27 +209,11 @@ class Mysql
             return (object) $result;
         }
     }
-/*
-    public function selectAllPaintings(){
-        $result = $this->select($this->columnNames_Painting_paintings, "paintings");
-        if ($result == null){
-            die('无法读取数据！' . mysqli_error($this->connect));
-        }else{
-            $paintings = mysqli_fetch_all($result);
-            for($i=0;$i<count($paintings);$i++){
-                $painting = $paintings[$i];
-                $painting['Description'] = substr($painting['Description'],0,150);
-                $painting = (object) $painting;
-                $paintings[$i]=$painting;
-            }
-            return $paintings;
-        }
-    }
-*/
+
     public function selectAllShortPaintings(){
         $result = $this->select($this->columnNames_ShortPainting_paintings, "paintings");
         if ($result == null){
-            die('无法读取数据！' . mysqli_error($this->connect));
+            return false;
         }else{
             $paintings = mysqli_fetch_all($result, MYSQLI_ASSOC);
             for($i=0;$i<count($paintings);$i++){
@@ -246,7 +230,7 @@ class Mysql
     public function selectPartShortPaintingsByIDList($PaintingIDList){
         $paintingList = array();
         for ($i=0;$i<count($PaintingIDList);$i++){
-            $painting = $this->selectAShortPaintingById($PaintingIDList[$i]);
+            $painting = $this->selectAShortPaintingById($PaintingIDList[$i][0]);
             array_push($paintingList, $painting);
         }
         return $paintingList;
@@ -265,14 +249,7 @@ class Mysql
         $result=$this->select($columnNames, 'paintings', "WHERE CustomerID_create='$CustomerID'");
         return mysqli_fetch_all($result);
     }
-/*
-    public function selectAllSoldPaintingIDofCustomer($CustomerID){
-        $columnNames=array('PaintingID');
-        $result=$this->select($columnNames, 'paintings',
-            "WHERE CustomerID_create='$CustomerID' AND Status='sold'");
-        return mysqli_fetch_all($result);
-    }
-*/
+
     public function selectAllOrderIDofCustomer($CustomerID){
         $columnNames=array('OrderID');
         $result=$this->select($columnNames, 'orders',
@@ -285,7 +262,7 @@ class Mysql
     public function selectACustomer($CustomerID){
         $result = $this->selectOneObjById($this->columnNames_Customer_customers, "customers", "CustomerID", $CustomerID);
         if ($result == null){
-            die('无法读取数据！' . mysqli_error($this->connect));
+            return false;
         }else{
             return (object) $result;
         }
@@ -294,7 +271,7 @@ class Mysql
     public function selectAReview($RatingID){
         $result = $this->selectOneObjById($this->columnNames_Review_reviews, "reviews", "RatingID", $RatingID);
         if ($result == null){
-            die('无法读取数据！' . mysqli_error($this->connect));
+            return false;
         }else{
             return (object) $result;
         }
@@ -315,7 +292,7 @@ class Mysql
     public function selectAOrder_raw($OrderID){
         $result = $this->selectOneObjById($this->columnNames_Order_orders, "orders", "OrderID", $OrderID);
         if ($result == null){
-            die('无法读取数据！' . mysqli_error($this->connect));
+            return false;
         }else{
             return (object) $result;
         }

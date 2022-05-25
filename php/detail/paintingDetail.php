@@ -4,14 +4,8 @@ require_once "../Mysql.php";
 
 $req_method = $_SERVER['REQUEST_METHOD'];
 
-$userID = checkCustomerToken();
-if (!$userID) {
-    $data = array("message"=> "无操作权限！");
-    http_response_code(401);
-    exit(json_encode($data));
-}
-
 if ($req_method == "GET"){
+
     if (array_key_exists('PaintingID',$_GET)){
         $PaintingID = $_GET['PaintingID'];
     }

@@ -50,7 +50,7 @@ elseif ($req_method == "POST"){//将一个商品添加到购物车
     }
     else{
         http_response_code(500);
-        exit(json_encode(array('message'=>"未知错误！")));
+        exit(json_encode(array('message'=>"添加失败！请刷新页面后重试！")));
     }
 
 }
