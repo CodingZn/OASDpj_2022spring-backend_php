@@ -17,6 +17,10 @@ if ($req_method == "GET"){
 
     $mysql = new Mysql();
     $painting = $mysql->selectAPaintingById($PaintingID);
+    if (!$painting){
+        http_response_code(404);
+        exit(json_encode(array('message'=>"该艺术品不存在！")));
+    }
     $popularity = $painting->Popularity;
     $popularity++;
     $mysql->update('paintings', array('Popularity'=>$popularity),
