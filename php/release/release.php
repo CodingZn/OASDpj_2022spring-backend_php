@@ -23,7 +23,9 @@ function getOrCreateArtist($data, Mysql $mysql)
         $columnNames = array('FirstName', 'LastName');
         $columnValues = array('', $ArtistName);
         $result = $mysql->insert('artists', $columnNames, $columnValues);
-        $ArtistID = mysqli_fetch_assoc($result)['LAST_INSERT_ID()'];
+        if ($result)
+            $ArtistID = mysqli_fetch_assoc($result)['LAST_INSERT_ID()'];
+        else return null;
     }
     return $ArtistID;
 }
@@ -40,12 +42,20 @@ function getOrCreateGenre($data, Mysql $mysql)
         }
         //新增一个Genre，仅包括Name
         $GenreName = $data['GenreName'];
-        //create genre with name
-        $columnNames = array('GenreName');
-        $columnValues = array($GenreName);
-        $result = $mysql->insert('genres', $columnNames, $columnValues);
-        $GenreID = mysqli_fetch_assoc($result)['LAST_INSERT_ID()'];
-        array_push($GenreIDList, $GenreID);
+        $result = $mysql->select("*", 'genres', "WHERE GenreName='$GenreName'");
+        if ($result){//已经存在该name
+            $GenreID = mysqli_fetch_assoc($result)['GenreID'];
+            array_push($GenreIDList, $GenreID);
+        }
+        else{//create genre with name
+            $columnNames = array('GenreName');
+            $columnValues = array($GenreName);
+            $result = $mysql->insert('genres', $columnNames, $columnValues);
+            if ($result){
+                $GenreID = mysqli_fetch_assoc($result)['LAST_INSERT_ID()'];
+                array_push($GenreIDList, $GenreID);
+            }
+        }
     }
     return $GenreIDList;
 }
@@ -62,12 +72,20 @@ function getOrCreateSubject($data, Mysql $mysql)
         }
         //新增一个Subject，仅包括Name
         $SubjectName = $data['SubjectName'];
-        //create genre with name
-        $columnNames = array('SubjectName');
-        $columnValues = array($SubjectName);
-        $result = $mysql->insert('subjects', $columnNames, $columnValues);
-        $SubjectID = mysqli_fetch_assoc($result)['LAST_INSERT_ID()'];
-        array_push($SubjectIDList, $SubjectID);
+        $result = $mysql->select("*", 'genres', "WHERE SubjectID='$SubjectName'");
+        if ($result){//已经存在该name
+            $SubjectID = mysqli_fetch_assoc($result)['SubjectID'];
+            array_push($SubjectIDList, $SubjectID);
+        }
+        else{//create with name
+            $columnNames = array('SubjectName');
+            $columnValues = array($SubjectName);
+            $result = $mysql->insert('subjects', $columnNames, $columnValues);
+            if ($result){
+                $SubjectID = mysqli_fetch_assoc($result)['LAST_INSERT_ID()'];
+                array_push($SubjectIDList, $SubjectID);
+            }
+        }
     }
     return $SubjectIDList;
 }
@@ -104,9 +122,9 @@ elseif ($req_method == "POST"){
     $MSRP = $data['MSRP'];
 
     $columnNames = array('ArtistID', 'Title', 'Description',
-        'YearOfWork', 'Width', 'Height', 'MSRP');
+        'YearOfWork', 'Width', 'Height', 'MSRP', 'CustomerID_create');
     $columnValues = array($ArtistID, $Title, $Description,
-        $YearOfWork, $Width, $Height, $MSRP);
+        $YearOfWork, $Width, $Height, $MSRP, $userID);
 
     $result = $mysql->insert('paintings', $columnNames, $columnValues);
     $PaintingID = mysqli_fetch_assoc($result)['LAST_INSERT_ID()'];
@@ -128,7 +146,7 @@ elseif ($req_method == "POST"){
     }
 
     http_response_code(200);
-    exit(json_encode(array('PaintingID'=>$PaintingID)));
+    exit(json_encode($map));
 }
 elseif ($req_method == "PUT"){
     if(array_key_exists('PaintingID', $_GET))
@@ -171,13 +189,23 @@ elseif ($req_method == "PUT"){
 
     $result = $mysql->update('paintings', $maps, "WHERE PaintingID='$PaintingID'");
 
+    $mysql->delete('paintinggenres', "WHERE PaintingID='$PaintingID'");
+    foreach ($GenreIDs as $GenreID){
+        $mysql->insert('paintinggenres', array('PaintingID', 'GenreID'), array($PaintingID, $GenreID));
+    }
+
+    $mysql->delete('paintingsubjects', "WHERE PaintingID='$PaintingID'");
+    foreach ($SubjectIDs as $SubjectID){
+        $mysql->insert('paintingsubjects', array('PaintingID', 'SubjectID'), array($PaintingID, $SubjectID));
+    }
     if (!$result){
         http_response_code(500);
         exit(json_encode(array('message'=>"未知错误！")));
     }
+    $ImageFileName = str_pad($PaintingID, 6, '0', STR_PAD_LEFT);
 
     http_response_code(200);
-    exit(json_encode(array('PaintingID'=>$PaintingID)));
+    exit(json_encode(array('ImageFileName'=>$ImageFileName)));
 }
 else{
     http_response_code(405);
