@@ -14,19 +14,10 @@ if (!$userID) {
 
 $base_upload_path = "../../../images/works/";
 
-if ($req_method == "POST" || $req_method == 'PUT'){
+if ($req_method == "POST"){
     $mysql = new Mysql();
     if ($req_method == "POST"){
         $ImageFileName = $_GET['ImageFileName'];
-    }
-    else{//put
-        $PaintingID = $_GET['PaintingID'];
-        $painting = $mysql->selectAPaintingById($PaintingID);
-        if (!$painting){
-            http_response_code(404);
-            exit(json_encode(array('message'=> "不存在该艺术品！请合法操作！")));
-        }
-        $ImageFileName = str_pad($PaintingID, 6, '0', STR_PAD_LEFT);
     }
 
     //判断文件是否合法
@@ -46,29 +37,16 @@ if ($req_method == "POST" || $req_method == 'PUT'){
 
     //重命名
     $ImageTypeName = str_replace("image/", ".", $ImageType);
-    $FileName = $ImageFileName . '.'. $ImageTypeName;
+    $FileName = $ImageFileName .  $ImageTypeName;
     $uploadFile["name"] = $FileName;
 
     //判断文件是否存在
     if (file_exists($base_upload_path . $uploadFile["name"]))
-    {//文件已经存在
-        if ($req_method == "POST"){
-            http_response_code(400);
-            exit(json_encode(array('message'=> $uploadFile['name']." 文件已经存在！")));
-        }
+    {//文件已经存在，覆盖
         $result = unlink($base_upload_path . $uploadFile["name"]);
-        move_uploaded_file($uploadFile["tmp_name"], $base_upload_path . $uploadFile["name"]);
-        exit(json_encode(array('message'=> "上传成功！")));
     }
-    else
-    {//文件不存在
-        if ($req_method == "PUT"){
-            http_response_code(404);
-            exit(json_encode(array('message'=> "艺术品所对应的图片不存在！")));
-        }
-        move_uploaded_file($uploadFile["tmp_name"], $base_upload_path . $uploadFile["name"]);
-        exit(json_encode(array('message'=> "上传成功！")));
-    }
+    move_uploaded_file($uploadFile["tmp_name"], $base_upload_path . $uploadFile["name"]);
+    exit(json_encode(array('message'=> "上传成功！")));
 }
 else{
     http_response_code(405);

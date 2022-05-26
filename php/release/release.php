@@ -203,8 +203,10 @@ elseif ($req_method == "PUT"){
         exit(json_encode(array('message'=>"未知错误！")));
     }
 
+    $ImageFileName = str_pad($PaintingID, 6, '0', STR_PAD_LEFT);
+
     http_response_code(200);
-    exit(json_encode(array('PaintingID'=>$PaintingID)));
+    exit(json_encode(array('PaintingID'=>$PaintingID, 'ImageFileName'=>$ImageFileName)));
 }
 else{
     http_response_code(405);
