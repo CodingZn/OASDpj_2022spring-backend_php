@@ -40,23 +40,22 @@ if ($req_method=="POST"){
     $salt = md5(rand());
     $hashed_password = crypt($password, $salt);
 
-    //在logon表中加入相应信息，并获取ID
-    $columnNames = array('Pass', 'Salt');
-    $columnValues = array($hashed_password, $salt);
-    $result = $mysql->insert('customerlogon', $columnNames, $columnValues);
+    //向customers表里插入数据
+    $columnNames = array('UserName', 'Email', 'Address', 'Phone');
+    $columnValues = array($username, $email, $address, $phone);
+    $result = $mysql->insert('customers', $columnNames, $columnValues);
     if (!$result){
         $data = array("message" => "未知原因，注册失败！");
         http_response_code(500);
         exit(json_encode($data));
     }
-
     $row = mysqli_fetch_assoc($result);
     $CustomerID = $row['LAST_INSERT_ID()'];
 
-//向customers表里插入数据
-    $columnNames = array('CustomerID', 'UserName', 'Email', 'Address', 'Phone');
-    $columnValues = array($CustomerID, $username, $email, $address, $phone);
-    $result = $mysql->insert('customers', $columnNames, $columnValues);
+    //在logon表中加入相应信息，并获取ID
+    $columnNames = array('CustomerID', 'Pass', 'Salt');
+    $columnValues = array($CustomerID, $hashed_password, $salt);
+    $result = $mysql->insert('customerlogon', $columnNames, $columnValues);
     if (!$result){
         $data = array("message" => "未知原因，注册失败！");
         http_response_code(500);
