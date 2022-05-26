@@ -17,6 +17,10 @@ if ($req_method == "GET"){
 
     $mysql = new Mysql();
     $painting = $mysql->selectAPaintingById($PaintingID);
+    $popularity = $painting->Popularity;
+    $popularity++;
+    $mysql->update('paintings', array('Popularity'=>$popularity),
+        "WHERE PaintingID='$PaintingID'");
 
     $data = array("painting" => $painting);
     exit(json_encode($data));
