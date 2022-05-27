@@ -146,7 +146,7 @@ elseif ($req_method == "POST"){
     }
 
     http_response_code(200);
-    exit(json_encode($map));
+    exit(json_encode(array('PaintingID'=>$PaintingID, 'ImageFileName'=>$ImageFileName)));
 }
 elseif ($req_method == "PUT"){
     if(array_key_exists('PaintingID', $_GET))

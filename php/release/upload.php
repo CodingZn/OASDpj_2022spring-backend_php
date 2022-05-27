@@ -16,13 +16,8 @@ $base_upload_path = "../../../images/works/";
 
 if ($req_method == "POST"){
     $mysql = new Mysql();
-    if ($req_method == "POST"){
-        if (!array_key_exists('ImageFileName', $_GET)){
-            http_response_code(400);
-            exit(json_encode(array("message"=> "缺少必要参数！")));
-        }
-        $ImageFileName = $_GET['ImageFileName'];
-    }
+    $PaintingID = $_GET['PaintingID'];
+    $ImageFileName = $_GET['ImageFileName'];
 
     //判断文件是否合法
     $uploadFile = $_FILES['uploadPic'];
@@ -50,6 +45,9 @@ if ($req_method == "POST"){
         $result = unlink($base_upload_path . $uploadFile["name"]);
     }
     move_uploaded_file($uploadFile["tmp_name"], $base_upload_path . $uploadFile["name"]);
+    //更新数据表中的文件名称
+    $map = array('ImageFileName'=>$FileName);
+    $mysql->update('paintings', $map, "WHERE PaintingID='$PaintingID'");
     exit(json_encode(array('message'=> "上传成功！")));
 }
 else{
