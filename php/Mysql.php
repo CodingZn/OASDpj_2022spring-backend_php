@@ -10,7 +10,7 @@ class Mysql
     private $connect;//数据库连接
     private $select;//架构art连接
 
-    //artistID->artistName
+    //artistID->artistName, Genre, Subject
     private $columnNames_ShortPainting_paintings = array("PaintingID", "ArtistID", "Title",
         "ImageFileName", "MSRP", "Popularity", "ReleaseDate", "Description", "Status");
 
@@ -150,8 +150,8 @@ class Mysql
             return false;
         }else{
             $this->addArtistName($result);
-            $this->addGenreName($result, $PaintingID);
-            $this->addSubjectNames($result, $PaintingID);
+            $this->addGenre($result, $PaintingID);
+            $this->addSubject($result, $PaintingID);
             return (object) $result;
         }
     }
@@ -165,7 +165,7 @@ class Mysql
 
     }
 
-    private function addGenreName(&$result, $PaintingID){
+    private function addGenre(&$result, $PaintingID){
         $result2 = mysqli_query($this->connect,"SELECT GenreID FROM paintinggenres WHERE PaintingID=$PaintingID");
         $GenreIDList = array();
         $GenreNameList = array();
@@ -178,10 +178,10 @@ class Mysql
             $row = mysqli_fetch_assoc($result3);
             array_push($GenreNameList, $row['GenreName']);
         }
-        $result['GenreNames'] = $GenreNameList;
+        $result['Genre'] = $GenreNameList;
     }
 
-    private function addSubjectNames(&$result, $PaintingID){
+    private function addSubject(&$result, $PaintingID){
         $result2 = mysqli_query($this->connect,"SELECT SubjectID FROM paintingsubjects WHERE PaintingID=$PaintingID");
         $GenreIDList = array();
         $GenreNameList = array();
@@ -194,7 +194,7 @@ class Mysql
             $row = mysqli_fetch_assoc($result3);
             array_push($GenreNameList, $row['SubjectName']);
         }
-        $result['SubjectNames'] = $GenreNameList;
+        $result['Subject'] = $GenreNameList;
     }
 
 
@@ -205,27 +205,30 @@ class Mysql
         }else{
             $result['Description'] = substr($result['Description'],0,150);
             $this->addArtistName($result);
-            $this->addGenreName($result, $PaintingID);
-            $this->addSubjectNames($result, $PaintingID);
+            $this->addGenre($result, $PaintingID);
+            $this->addSubject($result, $PaintingID);
             return (object) $result;
         }
     }
 
-    public function selectAllShortPaintings(){
-        $result = $this->select($this->columnNames_ShortPainting_paintings, "paintings");
-        if ($result == null){
-            return false;
-        }else{
-            $paintings = mysqli_fetch_all($result, MYSQLI_ASSOC);
-            for($i=0;$i<count($paintings);$i++){
-                $painting = $paintings[$i];
-                $painting = (object) $painting;
-                $painting->Description = substr($painting->Description,0,150);
-
-                $paintings[$i]=$painting;
-            }
-            return $paintings;
+    public function selectAllPaintingIDs(){
+        $result = $this->select(array('PaintingID'), 'paintings');
+        if (!$result) return false;
+        else{
+            $PaintingIDList = mysqli_fetch_all($result);
+            return $PaintingIDList;
         }
+    }
+
+    public function selectAllShortPaintings(){
+        $PaintingIDList = $this->selectAllPaintingIDs();
+        if(!$PaintingIDList) return false;
+        $paintingList = array();
+        for ($i=0;$i<count($PaintingIDList);$i++){
+            $painting = $this->selectAShortPaintingById($PaintingIDList[$i][0]);
+            array_push($paintingList, $painting);
+        }
+        return $paintingList;
     }
 
     public function selectPartShortPaintingsByIDList($PaintingIDList){
