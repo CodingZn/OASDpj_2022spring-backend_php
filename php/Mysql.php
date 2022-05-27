@@ -152,6 +152,7 @@ class Mysql
             $this->addArtistName($result);
             $this->addGenre($result, $PaintingID);
             $this->addSubject($result, $PaintingID);
+            $this->addCreatorUserName($result, $PaintingID);
             return (object) $result;
         }
     }
@@ -197,6 +198,17 @@ class Mysql
         $result['Subject'] = $GenreNameList;
     }
 
+    private function addCreatorUserName(&$result, $PaintingID){
+        $CreatorID = $result['CustomerID_create'];
+        if (!$CreatorID) {
+            $result['UserName_create']=null;return ;
+        }
+        $Customer = $this->selectACustomer($CreatorID);
+        if (!$Customer) {
+            $result['UserName_create']=null;return ;
+        }
+        $result['UserName_create']=$CreatorID['UserName'];
+    }
 
     public function selectAShortPaintingById($PaintingID){
         $result = $this->selectOneObjById($this->columnNames_ShortPainting_paintings, "paintings", "PaintingID", $PaintingID);
