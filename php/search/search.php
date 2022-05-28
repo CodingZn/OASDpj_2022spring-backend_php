@@ -85,19 +85,19 @@ function sort_by_Price($painting1, $painting2){
 
 function sort_by_ReleaseDate($painting1, $painting2){
     if ($painting1->ReleaseDate < $painting2->ReleaseDate)
-        return -1;
+        return 1;
     if ($painting1->ReleaseDate == $painting2->ReleaseDate)
         return 0;
     if ($painting1->ReleaseDate > $painting2->ReleaseDate)
-        return 1;
+        return -1;
 }
 
 function sort_by_Popularity($painting1, $painting2){
     if ($painting1->Popularity < $painting2->Popularity)
-        return -1;
+        return 1;
     if ($painting1->Popularity == $painting2->Popularity)
         return 0;
     if ($painting1->Popularity > $painting2->Popularity)
-        return 1;
+        return -1;
 }
 
