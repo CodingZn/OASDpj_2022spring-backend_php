@@ -207,7 +207,7 @@ class Mysql
         if (!$Customer) {
             $result['UserName_create']=null;return ;
         }
-        $result['UserName_create']=$CreatorID['UserName'];
+        $result['UserName_create']=$Customer->UserName;
     }
 
     private function addCommenterUserName(&$result){
@@ -312,6 +312,9 @@ class Mysql
     public function selectAllReviewsOfPainting($PaintingID){
         $columnNames=array('RatingID');
         $result=$this->select($columnNames, 'reviews', "WHERE PaintingID='$PaintingID'");
+        if (!$result){
+            return array();
+        }
         $reviewIDList = mysqli_fetch_all($result);
         $reviewList = array();
         for ($i=0; $i<count($reviewIDList); $i++){

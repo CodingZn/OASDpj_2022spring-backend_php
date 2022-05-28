@@ -29,6 +29,10 @@ elseif ($req_method == "POST"){//充值
     $account = $user->UserAccount;
 
     $amount = $data['amount'];
+    if (preg_match("/[^0-9]+/", $amount)){
+        http_response_code(400);
+        exit(json_encode(array('message'=>"输入非法！")));
+    }
     if ($amount > 1000 || $amount <= 0){
         http_response_code(400);
         exit(json_encode(array('message'=>"充值金额只能为1000以内的正整数！")));
