@@ -30,7 +30,7 @@ if ($req_method == "GET"){//获取自己的艺术品信息，包括已发布和�
         $orderIDList = $mysql->selectAllOrderIDofCustomer($userID);
         $orderList = array();
         for ($i=0; $i<count($orderIDList);$i++){
-            $order = $mysql->selectAOrder_full($orderIDList[$i]);
+            $order = $mysql->selectAOrder_full($orderIDList[$i][0]);
             array_push($orderList, $order);
         }
 
