@@ -64,15 +64,6 @@ function getPopular3Paintings(){
     return $newest3Paintings;
 }
 
-function sort_by_PaintingID($painting1, $painting2){
-    if ($painting1["PaintingID"] < $painting2["PaintingID"])
-        return -1;
-    if ($painting1["PaintingID"] == $painting2["PaintingID"])
-        return 0;
-    if ($painting1["PaintingID"] > $painting2["PaintingID"])
-        return 1;
-}
-
 function sort_by_ReleaseDate($painting1, $painting2){
     if ($painting1->ReleaseDate < $painting2->ReleaseDate)
         return -1;
