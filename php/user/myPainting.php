@@ -27,7 +27,24 @@ if ($req_method == "GET"){//获取自己的艺术品信息，包括已发布和�
     elseif ($type=='sold'){//查询卖出的所有艺术品，返回订单
 
         $mysql = new Mysql();
-        $orderIDList = $mysql->selectAllOrderIDofCustomer($userID);
+        $paintingIDList=$mysql->selectAllPaintingIDofCustomer($userID);
+        $paintingList=$mysql->selectPartShortPaintingsByIDList($paintingIDList);
+        $paintingList_sold = array();
+        for($i=0; $i<count($paintingList); $i++){
+            if ($paintingList[$i]->Status == 'sold'){
+                array_push($paintingList_sold, $paintingList[$i]);
+            }
+        }
+        $orderIDList = array();
+        for($i=0; $i<count($paintingList_sold); $i++){
+            $paintingID_sold = $paintingList_sold[$i][0];
+            $result = $mysql->selectById(array('OrderID'), 'orders', 'PaintingID', $paintingID_sold);
+            if (!$result) {
+                $orderID= mysqli_fetch_assoc($result);
+                array_push($orderIDList, $orderID);
+            }
+        }
+
         $orderList = array();
         for ($i=0; $i<count($orderIDList);$i++){
             $order = $mysql->selectAOrder_full($orderIDList[$i][0]);
