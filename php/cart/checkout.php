@@ -16,12 +16,12 @@ if (!$userID) {
 if ($req_method == "POST"){//下单并付款
     $mysql = new Mysql();
     //获取要购买的艺术品ID
-    if (array_key_exists('range',$_GET) && $_GET['all'] == '0'){//partly
-        $data = json_decode(file_get_contents('php://input'), true);
-        $paintingIDList=["PaintingIDs"];
-    }
-    else {
+    if (array_key_exists('all',$_GET) && $_GET['all'] == '1'){//all
         $paintingIDList=$mysql->selectAllPaintingIDinCart($userID);
+    }
+    else {//partly
+        $data = json_decode(file_get_contents('php://input'), true);
+        $paintingIDList=$data["PaintingIDs"];
     }
     if (count($paintingIDList) <= 0){
         http_response_code(400);
@@ -30,7 +30,7 @@ if ($req_method == "POST"){//下单并付款
 
     //对于每件艺术品，查找状态，检查余额，未售出则在购物车中删除，创建订单，扣款
     foreach ($paintingIDList as $PaintingID) {
-        $PaintingID = $PaintingID[0];
+
         //查找状态
         $painting = $mysql->selectAPaintingById($PaintingID);
         if ($painting->Status !== 'released'){
