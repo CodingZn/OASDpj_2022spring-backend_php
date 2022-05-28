@@ -210,6 +210,18 @@ class Mysql
         $result['UserName_create']=$CreatorID['UserName'];
     }
 
+    private function addCommenterUserName(&$result){
+        $CreatorID = $result['CustomerID'];
+        if (!$CreatorID) {
+            $result['UserName_create']=null;return ;
+        }
+        $Customer = $this->selectACustomer($CreatorID);
+        if (!$Customer) {
+            $result['UserName_create']=null;return ;
+        }
+        $result['UserName_create']=$Customer->UserName;
+    }
+
     public function selectAShortPaintingById($PaintingID){
         $result = $this->selectOneObjById($this->columnNames_ShortPainting_paintings, "paintings", "PaintingID", $PaintingID);
         if ($result == null){
@@ -292,6 +304,7 @@ class Mysql
         if ($result == null){
             return false;
         }else{
+            $this->addCommenterUserName($result, $RatingID);
             return (object) $result;
         }
     }

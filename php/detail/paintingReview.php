@@ -17,6 +17,9 @@ if ($req_method == "GET"){
     $mysql = new Mysql();
     $reviews = $mysql->selectAllReviewsOfPainting($PaintingID);
 
+    //按点赞数排序
+    usort($reviews, "sort_Reviews_by_likes_reverse");
+
     $data = array('reviews'=>$reviews);
     exit(json_encode($data));
 
@@ -119,4 +122,13 @@ elseif($req_method == "DELETE"){//删除评论
 }
 else{
     http_response_code(405);
+}
+
+function sort_Reviews_by_likes_reverse($Review1, $Review2){
+    if ($Review1->Rating > $Review2->Rating)
+        return -1;
+    if ($Review1->Rating == $Review2->Rating)
+        return 0;
+    if ($Review1->Rating < $Review2->Rating)
+        return 1;
 }
