@@ -40,10 +40,9 @@ function getRolling5Pics(){
 
 function getNewest3Paintings(){
     $newest3Paintings = array();
-    $columns = array("PaintingID", "ImageFileName", "Title", "MSRP", "ReleaseDate");
     $mysql = new Mysql();
-    $result = $mysql->select($columns, "paintings");
-    $rows = mysqli_fetch_all($result, MYSQLI_ASSOC);
+    $rows = $mysql->selectAllShortPaintings();
+
     usort($rows, "sort_by_ReleaseDate");
     $len = count($rows);
     for ($i=0;$i<3;$i++){
@@ -54,10 +53,9 @@ function getNewest3Paintings(){
 
 function getPopular3Paintings(){
     $newest3Paintings = array();
-    $columns = array("PaintingID", "ImageFileName", "Title", "MSRP", "Popularity");
     $mysql = new Mysql();
-    $result = $mysql->select($columns, "paintings");
-    $rows = mysqli_fetch_all($result, MYSQLI_ASSOC);
+    $rows = $mysql->selectAllShortPaintings();
+
     usort($rows, "sort_by_Popularity");
     $len = count($rows);
     for ($i=0;$i<3;$i++){
@@ -76,19 +74,19 @@ function sort_by_PaintingID($painting1, $painting2){
 }
 
 function sort_by_ReleaseDate($painting1, $painting2){
-    if ($painting1["ReleaseDate"] < $painting2["ReleaseDate"])
+    if ($painting1->ReleaseDate < $painting2->ReleaseDate)
         return -1;
-    if ($painting1["ReleaseDate"] == $painting2["ReleaseDate"])
+    if ($painting1->ReleaseDate == $painting2->ReleaseDate)
         return 0;
-    if ($painting1["ReleaseDate"] > $painting2["ReleaseDate"])
+    if ($painting1->ReleaseDate > $painting2->ReleaseDate)
         return 1;
 }
 
 function sort_by_Popularity($painting1, $painting2){
-    if ($painting1["Popularity"] < $painting2["Popularity"])
+    if ($painting1->Popularity < $painting2->Popularity)
         return -1;
-    if ($painting1["Popularity"] == $painting2["Popularity"])
+    if ($painting1->Popularity == $painting2->Popularity)
         return 0;
-    if ($painting1["Popularity"] > $painting2["Popularity"])
+    if ($painting1->Popularity > $painting2->Popularity)
         return 1;
 }
