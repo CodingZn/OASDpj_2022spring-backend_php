@@ -53,7 +53,9 @@ if ($req_method == "GET"){//搜索
         array_push($paintingList, $paintingList_all[($page - 1) * $pagesize + $i]);
     }
 
-    $data = array('paintings'=>$paintingList, 'message'=>'操作成功！');
+    $totalPages = ceil(count($paintingList_all) / $pagesize);
+
+    $data = array('paintings'=>$paintingList, 'totalPages'=> $totalPages, 'message'=>'操作成功！');
 
     http_response_code(200);
 
