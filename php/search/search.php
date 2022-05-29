@@ -32,28 +32,37 @@ if ($req_method == "GET"){//搜索
 
     $mysql = new Mysql();
     $paintingList_all = $mysql->selectAllShortPaintings();
+
+    $text = strtolower($text);
+    $selected_paintingList = array();
+    foreach ($paintingList_all as $item){
+        if ((!$text) || strpos(strtolower($item->Title), $text) || strpos(strtolower($item->ArtistName), $text)){
+            array_push($selected_paintingList, $item);
+        }
+    }
+
     switch ($orderby){
         case 'Title':
-            usort($paintingList_all, 'sort_by_Title');
+            usort($selected_paintingList, 'sort_by_Title');
             break;
         case 'Popularity':
-            usort($paintingList_all, 'sort_by_Popularity');
+            usort($selected_paintingList, 'sort_by_Popularity');
             break;
         case 'Price':
-            usort($paintingList_all, 'sort_by_Price');
+            usort($selected_paintingList, 'sort_by_Price');
             break;
         case 'ReleaseDate':
-            usort($paintingList_all, 'sort_by_ReleaseDate');
+            usort($selected_paintingList, 'sort_by_ReleaseDate');
             break;
     }
 
     $paintingList = array();
 
-    for($i=0; $i<$pagesize && (($page - 1) * $pagesize + $i < count($paintingList_all)); $i++){
-        array_push($paintingList, $paintingList_all[($page - 1) * $pagesize + $i]);
+    for($i=0; $i<$pagesize && (($page - 1) * $pagesize + $i < count($selected_paintingList)); $i++){
+        array_push($paintingList, $selected_paintingList[($page - 1) * $pagesize + $i]);
     }
 
-    $totalPages = ceil(count($paintingList_all) / $pagesize);
+    $totalPages = ceil(count($selected_paintingList) / $pagesize);
 
     $data = array('paintings'=>$paintingList, 'totalPages'=> $totalPages, 'message'=>'操作成功！');
 
