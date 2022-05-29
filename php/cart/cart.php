@@ -62,35 +62,36 @@ elseif ($req_method == "POST"){//将一个商品添加到购物车
     }
 
 }
-elseif ($req_method == "DELETE"){//删除购物车中的一个艺术品
-    if (array_key_exists('PaintingID',$_GET)){
-        $PaintingID = $_GET['PaintingID'];
-    }
-    else {
-        $data = array("message" => "缺少必要参数！");
-        http_response_code(400);
-        exit(json_encode($data));
-    }
+elseif ($req_method == "DELETE"){//删除购物车中的艺术品
     $mysql=new Mysql();
-
-    //检查是否已经添加到购物车
-    $result = $mysql->select("*", 'customer_cart',
-        "WHERE CustomerID='$userID' AND PaintingID='$PaintingID'");
-    if (!$result){
+//获取表单
+    $data = json_decode(file_get_contents('php://input'), true);
+    $PaintingIDs = $data['PaintingIDs'];
+    if (count($PaintingIDs) === 0) {
         http_response_code(400);
-        $data=array('message'=>"您的购物车里没有该商品！");
-        exit(json_encode($data));
+        exit(json_encode(array('message'=>"没有要删除的商品！")));
     }
-    $result=$mysql->delete('customer_cart', "WHERE CustomerID='$userID' AND PaintingID='$PaintingID'");
-    if ($result){
-        http_response_code(200);
-        $data=array('message'=>"删除成功！");
-        exit(json_encode($data));
+    $message = "";
+    for($i=0; $i<count($PaintingIDs); $i++){
+        $PaintingID=$PaintingIDs[$i];
+        $data=array();
+        //检查是否已经添加到购物车
+        $result = $mysql->select("*", 'customer_cart',
+            "WHERE CustomerID='$userID' AND PaintingID='$PaintingID'");
+        if (!$result){
+            $message = $message ."您的购物车里没有 $PaintingID 商品！ ";
+        }
+        $result=$mysql->delete('customer_cart', "WHERE CustomerID='$userID' AND PaintingID='$PaintingID'");
+        if ($result){
+            $message = $message ." $PaintingID 删除成功！";
+        }
+        else{
+            http_response_code(500);
+            exit(json_encode(array('message'=>"未知错误！")));
+        }
     }
-    else{
-        http_response_code(500);
-        exit(json_encode(array('message'=>"未知错误！")));
-    }
+    exit(json_encode(array('message'=>$message)));
+
 }
 else{
     http_response_code(405);
