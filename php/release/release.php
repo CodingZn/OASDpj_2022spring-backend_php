@@ -5,13 +5,6 @@ require_once "../checkToken.php";
 
 $req_method = $_SERVER['REQUEST_METHOD'];
 
-$userID = checkCustomerToken();
-if (!$userID) {
-    $data = array("message"=> "无操作权限！");
-    http_response_code(401);
-    exit(json_encode($data));
-}
-
 //判断新增艺术家或从已有里选择，获取ArtistID，只能单选
 function getOrCreateArtist($data, Mysql $mysql)
 {
@@ -91,6 +84,14 @@ function getOrCreateSubject($data, Mysql $mysql)
 }
 
 if ($req_method == "GET"){//查找一个艺术品
+
+    $userID = checkCustomerToken();
+    if (!$userID) {
+        $data = array("message"=> "无操作权限！");
+        http_response_code(401);
+        exit(json_encode($data));
+    }
+
     if (array_key_exists('PaintingID',$_GET)){
         $PaintingID = $_GET['PaintingID'];
     }
@@ -107,6 +108,14 @@ if ($req_method == "GET"){//查找一个艺术品
 
 }
 elseif ($req_method == "POST"){
+
+    $userID = checkCustomerToken();
+    if (!$userID) {
+        $data = array("message"=> "无操作权限！");
+        http_response_code(401);
+        exit(json_encode($data));
+    }
+
 //获取表单
     $data = json_decode(file_get_contents('php://input'), true);
     $mysql = new Mysql();
@@ -149,6 +158,14 @@ elseif ($req_method == "POST"){
     exit(json_encode(array('PaintingID'=>$PaintingID, 'ImageFileName'=>$ImageFileName)));
 }
 elseif ($req_method == "PUT"){
+
+    $userID = checkCustomerToken();
+    if (!$userID) {
+        $data = array("message"=> "无操作权限！");
+        http_response_code(401);
+        exit(json_encode($data));
+    }
+
     if(array_key_exists('PaintingID', $_GET))
         $PaintingID = $_GET['PaintingID'];
     else{
@@ -207,6 +224,9 @@ elseif ($req_method == "PUT"){
 
     http_response_code(200);
     exit(json_encode(array('PaintingID'=>$PaintingID, 'ImageFileName'=>$ImageFileName)));
+}
+elseif ($req_method=="OPTIONS"){
+    http_response_code(200);
 }
 else{
     http_response_code(405);

@@ -81,6 +81,10 @@ elseif ($req_method == "DELETE"){//删除已发布的艺术品
         http_response_code(403);
         exit(json_encode(array('message'=>'您没有权限删除此艺术品！')));
     }
+    if ($painting->Status == 'sold'){
+        http_response_code(400);
+        exit(json_encode(array('message'=>'已经卖出的艺术品不能删除！')));
+    }
 
     //删除操作
     $result = $mysql->delete('paintings', "WHERE PaintingID='$PaintingID'");
