@@ -5,14 +5,15 @@ require_once "../checkToken.php";
 
 $req_method = $_SERVER['REQUEST_METHOD'];
 
-$userID = checkCustomerToken();
-if (!$userID) {
-    $data = array("message"=> "无操作权限！");
-    http_response_code(401);
-    exit(json_encode($data));
-}
-
 if ($req_method == "GET"){//获取自己的艺术品信息，包括已发布和已卖出
+
+    $userID = checkCustomerToken();
+    if (!$userID) {
+        $data = array("message"=> "无操作权限！");
+        http_response_code(401);
+        exit(json_encode($data));
+    }
+
     if(array_key_exists('type', $_GET))
         $type = $_GET['type'];
 
@@ -63,6 +64,14 @@ if ($req_method == "GET"){//获取自己的艺术品信息，包括已发布和�
     exit(json_encode($data));
 }
 elseif ($req_method == "DELETE"){//删除已发布的艺术品
+
+    $userID = checkCustomerToken();
+    if (!$userID) {
+        $data = array("message"=> "无操作权限！");
+        http_response_code(401);
+        exit(json_encode($data));
+    }
+
     if(array_key_exists('PaintingID', $_GET))
         $PaintingID = $_GET['PaintingID'];
     else{
@@ -95,6 +104,9 @@ elseif ($req_method == "DELETE"){//删除已发布的艺术品
 
     http_response_code(200);
     exit(json_encode(array('message'=>"删除成功！")));
+}
+else if ($req_method=='OPTIONS'){
+    http_response_code(200);
 }
 else{
     http_response_code(405);

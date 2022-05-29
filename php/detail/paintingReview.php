@@ -120,6 +120,9 @@ elseif($req_method == "DELETE"){//删除评论
     $data=array('message'=>"删除成功！");
     exit(json_encode($data));
 }
+else if ($req_method=='OPTIONS'){
+    http_response_code(200);
+}
 else{
     http_response_code(405);
 }

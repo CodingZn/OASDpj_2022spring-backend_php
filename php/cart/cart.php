@@ -5,14 +5,14 @@ require_once "../checkToken.php";
 
 $req_method = $_SERVER['REQUEST_METHOD'];
 
-$userID = checkCustomerToken();
-if (!$userID) {
-    $data = array("message"=> "无操作权限！");
-    http_response_code(401);
-    exit(json_encode($data));
-}
-
 if ($req_method == "GET"){//获取购物车里的所有商品
+
+    $userID = checkCustomerToken();
+    if (!$userID) {
+        $data = array("message"=> "无操作权限！");
+        http_response_code(401);
+        exit(json_encode($data));
+    }
 
     $mysql = new Mysql();
 
@@ -26,6 +26,13 @@ if ($req_method == "GET"){//获取购物车里的所有商品
     exit(json_encode($data));
 }
 elseif ($req_method == "POST"){//将一个商品添加到购物车
+    $userID = checkCustomerToken();
+    if (!$userID) {
+        $data = array("message"=> "无操作权限！");
+        http_response_code(401);
+        exit(json_encode($data));
+    }
+
     $mysql = new Mysql();
 //获取表单
     $data = json_decode(file_get_contents('php://input'), true);
@@ -63,6 +70,13 @@ elseif ($req_method == "POST"){//将一个商品添加到购物车
 
 }
 elseif ($req_method == "DELETE"){//删除购物车中的艺术品
+    $userID = checkCustomerToken();
+    if (!$userID) {
+        $data = array("message"=> "无操作权限！");
+        http_response_code(401);
+        exit(json_encode($data));
+    }
+
     $mysql=new Mysql();
 //获取表单
     $data = json_decode(file_get_contents('php://input'), true);
@@ -92,6 +106,9 @@ elseif ($req_method == "DELETE"){//删除购物车中的艺术品
     }
     exit(json_encode(array('message'=>$message)));
 
+}
+else if ($req_method=='OPTIONS'){
+    http_response_code(200);
 }
 else{
     http_response_code(405);
