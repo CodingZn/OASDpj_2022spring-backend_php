@@ -12,7 +12,7 @@ if (!$userID) {
     exit(json_encode($data));
 }
 
-$base_upload_path = "../../../images/works/";
+$base_upload_path = "../../../web1/images/works/";
 
 if ($req_method == "POST"){
     $mysql = new Mysql();
