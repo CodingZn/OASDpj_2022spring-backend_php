@@ -38,9 +38,9 @@ if ($req_method == "GET"){//获取自己的艺术品信息，包括已发布和�
         }
         $orderIDList = array();
         for($i=0; $i<count($paintingList_sold); $i++){
-            $paintingID_sold = $paintingList_sold[$i][0];
-            $result = $mysql->selectById(array('OrderID'), 'orders', 'PaintingID', $paintingID_sold);
-            if (!$result) {
+            $painting_sold = $paintingList_sold[$i];
+            $result = $mysql->selectById(array('OrderID'), 'orders', 'PaintingID', $painting_sold->PaintingID);
+            if ($result) {
                 $orderID= mysqli_fetch_assoc($result);
                 array_push($orderIDList, $orderID);
             }
@@ -48,7 +48,7 @@ if ($req_method == "GET"){//获取自己的艺术品信息，包括已发布和�
 
         $orderList = array();
         for ($i=0; $i<count($orderIDList);$i++){
-            $order = $mysql->selectAOrder_full($orderIDList[$i][0]);
+            $order = $mysql->selectAOrder_full($orderIDList[$i]['OrderID']);
             array_push($orderList, $order);
         }
 

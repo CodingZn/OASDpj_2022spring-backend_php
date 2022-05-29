@@ -333,7 +333,7 @@ class Mysql
         }
     }
 
-    public function selectAOrder_full($OrderID){
+    public function selectAOrder_full($OrderID){var_dump($OrderID);
         $order = $this->selectAOrder_raw($OrderID);
         $order->Painting = $this->selectAShortPaintingById($order->PaintingID);
         $order->Customer = $this->selectACustomer($order->CustomerID);
