@@ -96,6 +96,10 @@ elseif ($req_method == "DELETE"){//删除已发布的艺术品
     }
 
     //删除操作
+    $result = $mysql->delete('paintinggenres', "WHERE PaintingID='$PaintingID'");
+    $result = $mysql->delete('paintingsubjects', "WHERE PaintingID='$PaintingID'");
+    $result = $mysql->delete('reviews', "WHERE PaintingID='$PaintingID'");
+    $result = $mysql->delete('customer_cart', "WHERE PaintingID='$PaintingID'");
     $result = $mysql->delete('paintings', "WHERE PaintingID='$PaintingID'");
     if (!$result){
         http_response_code(500);

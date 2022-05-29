@@ -71,7 +71,7 @@ elseif($req_method == "PATCH"){//点赞或取消
         $rating = $rating + 1;
     else{
         if ($rating > 0)
-            $rating->Rating = $rating - 1;
+            $rating = $rating - 1;
     }
 
     //save
